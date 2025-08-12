@@ -3,11 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل الدخول – Google</title>
+<title>تسجيل الدخول</title>
 <style>
     body {
         font-family: Arial, sans-serif;
-        background-color: #f0f2f5;
+        background-color: #f0f4fa;
         margin: 0;
         padding: 0;
     }
@@ -19,172 +19,191 @@
     }
     .login-box {
         background-color: white;
-        padding: 40px 35px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        padding: 40px;
+        border-radius: 25px;
         display: flex;
-        flex-direction: column;
-        width: 360px;
-        box-sizing: border-box;
+        flex-direction: row;
+        width: 800px;
+        justify-content: space-between;
+        align-items: center;
     }
-    .logo {
-        display: block;
-        width: 75px;
-        margin: 0 auto 15px auto;
-    }
-    h2 {
-        font-weight: 400;
-        font-size: 24px;
-        margin: 0;
-        text-align: center;
-    }
-    p {
-        font-size: 14px;
-        color: #555;
-        text-align: center;
-        margin: 8px 0 25px 0;
+    .login-form {
+        width: 50%;
     }
     input[type="text"], input[type="password"] {
         width: 100%;
-        padding: 12px;
-        border: 1px solid #dadce0;
-        border-radius: 4px;
+        padding: 15px;
+        border: 2px solid #0066ff;
+        border-radius: 5px;
         font-size: 16px;
-        margin-bottom: 12px;
-        box-sizing: border-box;
+        margin-bottom: 5px;
     }
-    input:focus {
-        outline: none;
-        border: 2px solid #1a73e8;
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-bottom: 10px;
+        display: none;
     }
     .small-text {
-        font-size: 13px;
-        color: #1a73e8;
-        cursor: pointer;
-        margin-bottom: 25px;
-        display: inline-block;
+        font-size: 12px;
+        color: #0066ff;
     }
     .desc {
         font-size: 12px;
-        color: #555;
-        margin-top: 20px;
-        line-height: 1.5;
+        color: #333;
+        margin-top: 10px;
     }
     .desc a {
-        color: #1a73e8;
+        color: #0066ff;
         text-decoration: none;
     }
-    .desc a:hover {
-        text-decoration: underline;
-    }
-    .btn-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: 25px;
-    }
     button {
-        background-color: #1a73e8;
+        background-color: #0066ff;
         color: white;
-        padding: 10px 24px;
+        padding: 10px 30px;
         border: none;
-        border-radius: 4px;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    .create, .small-link {
+        margin-right: 15px;
         font-size: 14px;
+        color: #0066ff;
+        background: none;
+        border: none;
         cursor: pointer;
     }
-    .create {
-        background: none;
-        color: #1a73e8;
-        font-weight: 500;
-        padding: 0;
+    .text-side {
+        width: 45%;
+        text-align: center;
     }
-    .email-box {
-        border: 1px solid #dadce0;
-        padding: 6px 10px;
-        border-radius: 20px;
-        display: inline-flex;
-        align-items: center;
-        gap: 6px;
+    .text-side img {
+        width: 50px;
+        margin-bottom: 10px;
+    }
+    .text-side h2 {
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+    .text-side p {
         font-size: 14px;
-    }
-    label {
-        font-size: 13px;
         color: #555;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        margin-top: 5px;
     }
     .footer {
         text-align: center;
-        margin-top: 25px;
+        margin-top: 20px;
         font-size: 12px;
-        color: #777;
+        color: black;
     }
     .footer a {
         margin: 0 10px;
-        color: #777;
+        color: black;
         text-decoration: none;
     }
-    .footer a:hover {
-        text-decoration: underline;
+    label {
+        font-size: 12px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .email-box {
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        justify-content: space-between;
+        font-size: 14px;
+        width: fit-content;
+        margin: 0 auto;
+    }
+    #password-page {
+        display: none;
     }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <!-- صفحة البريد -->
+    <!-- صفحة البريد الإلكتروني -->
     <div id="email-page" class="login-box">
-        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-        <h2>تسجيل الدخول</h2>
-        <p>باستخدام حسابك على Google</p>
-        <input id="email-input" type="text" placeholder="البريد الإلكتروني أو الهاتف">
-        <span class="small-text">هل نسيت بريدك الإلكتروني؟</span>
-        <div class="desc">
-            ألا تمتلك هذا الكمبيوتر؟ استخدم وضع الضيف لتسجيل الدخول بشكل خاص.
-            <a href="#">مزيد من المعلومات</a>
+        <div class="login-form">
+            <input id="email-input" type="text" placeholder="البريد الإلكتروني أو الهاتف">
+            <div id="email-error" class="error-message"></div>
+            <div class="small-text">هل نسيت بريدك الإلكتروني؟</div>
+            <div class="desc">ألا تمتلك هذا الكمبيوتر؟ استخدم وضع الضيف لتسجيل الدخول بشكل خاص. <a href="#">مزيد من المعلومات حول استخدام "وضع الضيف"</a></div>
+            <div style="margin-top: 20px;">
+                <button onclick="showPasswordPage()">التالي</button>
+                <button class="create">إنشاء حساب</button>
+            </div>
         </div>
-        <div class="btn-row">
-            <button class="create">إنشاء حساب</button>
-            <button onclick="showPasswordPage()">التالي</button>
+        <div class="text-side">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+            <h2>تسجيل الدخول</h2>
+            <p>باستخدام حسابك على <b>Google</b></p>
         </div>
     </div>
 
     <!-- صفحة كلمة المرور -->
-    <div id="password-page" class="login-box" style="display:none;">
-        <img class="logo" src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-        <h2>مرحباً</h2>
-        <div class="email-box">
-            <span id="display-email">example@gmail.com</span>
+    <div id="password-page" class="login-box">
+        <div class="login-form">
+            <input id="password-input" type="password" placeholder="إدخال كلمة المرور">
+            <div id="password-error" class="error-message"></div>
+            <label>
+                <input type="checkbox" id="show-password"> عرض كلمة المرور
+            </label>
+            <div style="margin-top: 20px;">
+                <button>التالي</button>
+                <button class="small-link">تجربة طريقة أخرى</button>
+            </div>
         </div>
-        <input type="password" id="password-input" placeholder="إدخال كلمة المرور">
-        <label>
-            <input type="checkbox" id="show-password"> عرض كلمة المرور
-        </label>
-        <div class="btn-row">
-            <button class="create">تجربة طريقة أخرى</button>
-            <button>التالي</button>
+        <div class="text-side">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+            <h2>مرحباً</h2>
+            <div class="email-box">
+                <span>▼</span> <span id="display-email">example@gmail.com</span> <span>👤</span>
+            </div>
         </div>
     </div>
 </div>
 
 <div class="footer">
-    <a href="#">الخصوصية</a>
     <a href="#">الشروط</a>
+    <a href="#">الخصوصية</a>
     <a href="#">المساعدة</a>
+    <a href="#">العربية</a>
 </div>
 
 <script>
     function showPasswordPage() {
         const email = document.getElementById('email-input').value.trim();
-        if(email) {
-            document.getElementById('email-page').style.display = 'none';
-            document.getElementById('password-page').style.display = 'block';
-            document.getElementById('display-email').textContent = email;
-        } else {
-            alert('الرجاء إدخال البريد الإلكتروني أو رقم الهاتف');
+        const emailError = document.getElementById('email-error');
+
+        if(email === '') {
+            emailError.textContent = 'الرجاء إدخال البريد الإلكتروني أو رقم الهاتف';
+            emailError.style.display = 'block';
+            return;
         }
+        if(!validateEmailOrPhone(email)) {
+            emailError.textContent = 'تعذّر العثور على حسابك. الرجاء التحقق من البريد الإلكتروني أو رقم الهاتف وإعادة المحاولة.';
+            emailError.style.display = 'block';
+            return;
+        }
+
+        emailError.style.display = 'none';
+        document.getElementById('email-page').style.display = 'none';
+        document.getElementById('password-page').style.display = 'flex';
+        document.getElementById('display-email').textContent = email;
+    }
+
+    function validateEmailOrPhone(input) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[0-9]{6,15}$/;
+        return emailRegex.test(input) || phoneRegex.test(input);
     }
 
     document.getElementById('show-password').addEventListener('change', function() {
