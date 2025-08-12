@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f4fa;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .login-box {
+        background-color: white;
+        padding: 40px;
+        border-radius: 25px;
+        display: flex;
+        flex-direction: row-reverse; /* عكس الاتجاه */
+        width: 800px;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .login-form {
+        width: 50%;
+    }
+    input[type="text"] {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #0066ff;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-bottom: 10px;
+    }
+    .small-text {
+        font-size: 12px;
+        color: #0066ff;
+    }
+    .desc {
+        font-size: 12px;
+        color: #333;
+        margin-top: 10px;
+    }
+    .desc a {
+        color: #0066ff;
+        text-decoration: none;
+    }
+    button {
+        background-color: #0066ff;
+        color: white;
+        padding: 10px 30px;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    .create {
+        margin-right: 15px;
+        font-size: 14px;
+        color: #0066ff;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    .text-side {
+        width: 45%;
+        text-align: center;
+    }
+    .text-side h2 {
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+    .text-side p {
+        font-size: 14px;
+        color: #555;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 12px;
+        color: black;
+    }
+    .footer a {
+        margin: 0 10px;
+        color: black;
+        text-decoration: none;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <div class="login-box">
+        <div class="text-side">
+            <h2>تسجيل الدخول</h2>
+            <p>باستخدام حسابك على <b>شركتين الماصة</b></p>
+        </div>
+        <div class="login-form">
+            <input type="text" placeholder="البريد الإلكتروني أو الهاتف">
+            <div class="small-text">هل نسيت بريدك الإلكتروني؟</div>
+            <div class="desc">ألا تمتلك هذا الكمبيوتر؟ استخدم وضع الضيف لتسجيل الدخول بشكل خاص. <a href="#">مزيد من المعلومات حول استخدام "وضع الضيف"</a></div>
+            <div style="margin-top: 20px;">
+                <button>التالي</button>
+                <button class="create">إنشاء حساب</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="footer">
+    <a href="#">الشروط</a>
+    <a href="#">الخصوصية</a>
+    <a href="#">المساعدة</a>
+    <a href="#">العربية</a>
+</div>
+
+</body>
+</html>
