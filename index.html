@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل الدخول - كلمة المرور</title>
+<title>تسجيل الدخول</title>
 <style>
     body {
         font-family: Arial, sans-serif;
@@ -22,6 +22,7 @@
         padding: 40px;
         border-radius: 25px;
         display: flex;
+        flex-direction: row;
         width: 800px;
         justify-content: space-between;
         align-items: center;
@@ -29,7 +30,7 @@
     .login-form {
         width: 50%;
     }
-    input[type="password"] {
+    input[type="text"], input[type="password"] {
         width: 100%;
         padding: 15px;
         border: 2px solid #0066ff;
@@ -37,12 +38,18 @@
         font-size: 16px;
         margin-bottom: 10px;
     }
-    label {
+    .small-text {
+        font-size: 12px;
+        color: #0066ff;
+    }
+    .desc {
         font-size: 12px;
         color: #333;
-        display: flex;
-        align-items: center;
-        gap: 5px;
+        margin-top: 10px;
+    }
+    .desc a {
+        color: #0066ff;
+        text-decoration: none;
     }
     button {
         background-color: #0066ff;
@@ -54,7 +61,7 @@
         cursor: pointer;
         margin-top: 10px;
     }
-    .small-link {
+    .create, .small-link {
         margin-right: 15px;
         font-size: 14px;
         color: #0066ff;
@@ -68,10 +75,33 @@
     }
     .text-side img {
         width: 50px;
+        margin-bottom: 10px;
     }
     .text-side h2 {
         font-size: 26px;
-        margin: 5px 0;
+        margin-bottom: 5px;
+    }
+    .text-side p {
+        font-size: 14px;
+        color: #555;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 12px;
+        color: black;
+    }
+    .footer a {
+        margin: 0 10px;
+        color: black;
+        text-decoration: none;
+    }
+    label {
+        font-size: 12px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 5px;
     }
     .email-box {
         border: 1px solid #ccc;
@@ -85,27 +115,38 @@
         width: fit-content;
         margin: 0 auto;
     }
-    .footer {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 12px;
-        color: black;
-    }
-    .footer a {
-        margin: 0 10px;
-        color: black;
-        text-decoration: none;
+    #password-page {
+        display: none;
     }
 </style>
 </head>
 <body>
 
 <div class="container">
-    <div class="login-box">
+    <!-- صفحة البريد الإلكتروني -->
+    <div id="email-page" class="login-box">
+        <div class="login-form">
+            <input id="email-input" type="text" placeholder="البريد الإلكتروني أو الهاتف">
+            <div class="small-text">هل نسيت بريدك الإلكتروني؟</div>
+            <div class="desc">ألا تمتلك هذا الكمبيوتر؟ استخدم وضع الضيف لتسجيل الدخول بشكل خاص. <a href="#">مزيد من المعلومات حول استخدام "وضع الضيف"</a></div>
+            <div style="margin-top: 20px;">
+                <button onclick="showPasswordPage()">التالي</button>
+                <button class="create">إنشاء حساب</button>
+            </div>
+        </div>
+        <div class="text-side">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+            <h2>تسجيل الدخول</h2>
+            <p>باستخدام حسابك على <b>شركتين الماصة</b></p>
+        </div>
+    </div>
+
+    <!-- صفحة كلمة المرور -->
+    <div id="password-page" class="login-box">
         <div class="login-form">
             <input type="password" placeholder="إدخال كلمة المرور">
             <label>
-                <input type="checkbox"> عرض كلمة المرور
+                <input type="checkbox" id="show-password"> عرض كلمة المرور
             </label>
             <div style="margin-top: 20px;">
                 <button>التالي</button>
@@ -116,7 +157,7 @@
             <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
             <h2>مرحباً</h2>
             <div class="email-box">
-                <span>▼</span> foxfoxdz1235@gmail.com <span>👤</span>
+                <span>▼</span> <span id="display-email">foxfoxdz1235@gmail.com</span> <span>👤</span>
             </div>
         </div>
     </div>
@@ -128,6 +169,37 @@
     <a href="#">المساعدة</a>
     <a href="#">العربية</a>
 </div>
+
+<script>
+    function showPasswordPage() {
+        // الحصول على البريد الإلكتروني المدخل
+        const email = document.getElementById('email-input').value;
+        
+        // إذا كان البريد الإلكتروني غير فارغ
+        if(email.trim() !== '') {
+            // إخفاء صفحة البريد الإلكتروني
+            document.getElementById('email-page').style.display = 'none';
+            
+            // عرض صفحة كلمة المرور
+            document.getElementById('password-page').style.display = 'flex';
+            
+            // عرض البريد الإلكتروني في الصفحة الثانية
+            document.getElementById('display-email').textContent = email;
+        } else {
+            alert('الرجاء إدخال بريد إلكتروني صحيح');
+        }
+    }
+    
+    // إظهار/إخفاء كلمة المرور عند النقر على checkbox
+    document.getElementById('show-password').addEventListener('change', function() {
+        const passwordInput = document.querySelector('input[type="password"]');
+        if(this.checked) {
+            passwordInput.type = 'text';
+        } else {
+            passwordInput.type = 'password';
+        }
+    });
+</script>
 
 </body>
 </html>
