@@ -1,304 +1,40 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>3D Shooter — GitHub Pages</title>
-  <style>
-    html, body { height: 100%; margin: 0; background: #0b1020; color: #e8ecf1; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif; }
-    #hud { position: fixed; inset: 0; pointer-events: none; }
-    #topbar { position: absolute; top: 10px; left: 10px; right: 10px; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 600; }
-    .pill { padding: 6px 10px; border-radius: 999px; background: rgba(0,0,0,.35); backdrop-filter: blur(6px); box-shadow: 0 4px 18px rgba(0,0,0,.2); }
-    #crosshair { position: absolute; top: 50%; left: 50%; width: 16px; height: 16px; margin-left: -8px; margin-top: -8px; border-radius: 50%; border: 2px solid rgba(255,255,255,.9); box-shadow: 0 0 0 2px rgba(255,255,255,.15); opacity: .85; }
-    #help { position: absolute; bottom: 16px; left: 50%; transform: translateX(-50%); text-align: center; line-height: 1.6; background: rgba(0,0,0,.45); padding: 10px 14px; border-radius: 14px; font-size: 14px; }
-    #overlay { position: fixed; inset: 0; display: grid; place-items: center; background: radial-gradient(1200px 800px at 50% 50%, rgba(10,14,32,.75), rgba(5,7,18,.95)); }
-    #panel { width: min(560px, 92vw); background: rgba(14,20,40,.75); border: 1px solid rgba(255,255,255,.06); border-radius: 18px; padding: 22px; box-shadow: 0 20px 80px rgba(0,0,0,.45); text-align: center; }
-    #panel h1 { margin: 0 0 6px; font-size: 28px; letter-spacing: .5px; }
-    #panel p { opacity: .9; }
-    #startBtn, #restartBtn { pointer-events: auto; cursor: pointer; background: #5b8cff; color: #fff; border: none; padding: 10px 16px; border-radius: 12px; font-weight: 700; font-size: 16px; box-shadow: 0 10px 30px rgba(91,140,255,.35); }
-    #startBtn:hover, #restartBtn:hover { filter: brightness(1.06); }
-    #footerLink { margin-top: 10px; font-size: 12px; opacity: .8; }
-    a { color: #9fc0ff; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لعبة الشوتر - إطلاق النار</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <div id="overlay">
-    <div id="panel">
-      <h1>🎯 3D Shooter</h1>
-      <p>انقر <b>ابدأ</b> ثم انقر في الشاشة لقفل المؤشر. الحركة: <b>W/A/S/D</b> — القفز: <b>Space</b> — إطلاق النار: <b>Click</b> — الركض: <b>Shift</b> — إعادة التحميل: <b>R</b></p>
-      <button id="startBtn">ابدأ اللعبة</button>
-      <div id="footerLink">صُممت لتعمل مباشرة على <b>GitHub Pages</b> (ملف واحد فقط).</div>
+    <div class="game-container">
+        <h1>لعبة الشوتر</h1>
+        <div class="game-stats">
+            <div class="stat">النقاط: <span id="score">0</span></div>
+            <div class="stat">الصحة: <span id="health">100</span>%</div>
+            <div class="stat">الذخيرة: <span id="ammo">30</span>/30</div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+        <div class="weapon-selector">
+            <button class="weapon-btn active" data-weapon="pistol">
+                <img src="https://i.imgur.com/JjQ8W3p.png" alt="مسدس">
+                <span>مسدس</span>
+            </button>
+            <button class="weapon-btn" data-weapon="rifle">
+                <img src="https://i.imgur.com/L5v7Q3x.png" alt="بندقية">
+                <span>بندقية</span>
+            </button>
+            <button class="weapon-btn" data-weapon="shotgun">
+                <img src="https://i.imgur.com/K9mWX6Z.png" alt="شوتغن">
+                <span>شوتغن</span>
+            </button>
+        </div>
+        <div class="controls">
+            <p>استخدم زر الفأرة الأيسر لإطلاق النار | حرك الفأرة لتوجيه السلاح</p>
+        </div>
     </div>
-  </div>
 
-  <div id="hud" style="display:none">
-    <div id="topbar">
-      <div class="pill">النقاط: <span id="score">0</span></div>
-      <div class="pill">الذخيرة: <span id="ammo">12</span> / 12</div>
-      <div class="pill">الصحة: <span id="health">100</span></div>
-      <div class="pill">الأعداء: <span id="enemyCount">0</span></div>
-    </div>
-    <div id="crosshair"></div>
-    <div id="help">نصيحة: اضرب الرؤوس للمضاعفة ×2 — تجنب اقتراب المكعبات الحمراء منك!</div>
-  </div>
-
-  <script type="module">
-    import * as THREE from 'https://unpkg.com/three@0.159.0/build/three.module.js';
-    import { PointerLockControls } from 'https://unpkg.com/three@0.159.0/examples/jsm/controls/PointerLockControls.js';
-
-    // --- Renderer & Scene ---
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    document.body.appendChild(renderer.domElement);
-
-    const scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0b1020);
-
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-
-    // Lighting
-    const hemi = new THREE.HemisphereLight(0xbdd3ff, 0x0b1020, 0.8);
-    scene.add(hemi);
-    const dir = new THREE.DirectionalLight(0xffffff, 0.8);
-    dir.position.set(5, 10, 2);
-    scene.add(dir);
-
-    // Floor
-    const floorGeo = new THREE.PlaneGeometry(400, 400);
-    const floorMat = new THREE.MeshStandardMaterial({ color: 0x0f1530, metalness: 0.2, roughness: 0.9 });
-    const floor = new THREE.Mesh(floorGeo, floorMat);
-    floor.rotation.x = -Math.PI/2;
-    floor.receiveShadow = true;
-    scene.add(floor);
-
-    // Decorative pillars
-    const pillarGeo = new THREE.CylinderGeometry(0.5, 0.5, 6, 12);
-    const pillarMat = new THREE.MeshStandardMaterial({ color: 0x15224a, metalness: .1, roughness: .8 });
-    for (let i=0;i<16;i++) {
-      const p = new THREE.Mesh(pillarGeo, pillarMat);
-      const angle = (i/16) * Math.PI*2;
-      const radius = 60;
-      p.position.set(Math.cos(angle)*radius, 3, Math.sin(angle)*radius);
-      scene.add(p);
-    }
-
-    // Controls
-    const controls = new PointerLockControls(camera, renderer.domElement);
-    camera.position.set(0, 1.7, 5);
-
-    const overlay = document.getElementById('overlay');
-    const startBtn = document.getElementById('startBtn');
-    const hud = document.getElementById('hud');
-
-    startBtn.addEventListener('click', () => {
-      overlay.style.display = 'none';
-      hud.style.display = 'block';
-      controls.lock();
-    });
-
-    renderer.domElement.addEventListener('click', () => {
-      if (!controls.isLocked) controls.lock();
-    });
-
-    // Movement state
-    const keys = { w:false, a:false, s:false, d:false, space:false, shift:false };
-    document.addEventListener('keydown', (e)=>{ if(keys[e.key.toLowerCase()]!==undefined) keys[e.key.toLowerCase()] = true; });
-    document.addEventListener('keyup', (e)=>{ if(keys[e.key.toLowerCase()]!==undefined) keys[e.key.toLowerCase()] = false; });
-
-    // Player physics
-    const velocity = new THREE.Vector3();
-    const direction = new THREE.Vector3();
-    let canJump = true;
-
-    // Bullets
-    const bullets = []; // {mesh, vel, ttl}
-    let ammo = 12; const magSize = 12; let score = 0; let health = 100;
-    const scoreEl = document.getElementById('score');
-    const ammoEl = document.getElementById('ammo');
-    const healthEl = document.getElementById('health');
-    const enemyCountEl = document.getElementById('enemyCount');
-
-    function shoot() {
-      if (!controls.isLocked) return;
-      if (ammo <= 0) return; // empty
-      ammo--; ammoEl.textContent = ammo;
-      const bulletGeo = new THREE.SphereGeometry(0.08, 10, 10);
-      const bulletMat = new THREE.MeshStandardMaterial({ color: 0xffffff, emissive: 0x3355ff });
-      const bullet = new THREE.Mesh(bulletGeo, bulletMat);
-      const origin = new THREE.Vector3();
-      origin.copy(camera.position);
-      bullet.position.copy(origin);
-      scene.add(bullet);
-      const dirVec = new THREE.Vector3();
-      camera.getWorldDirection(dirVec);
-      const speed = 1.2;
-      const vel = dirVec.multiplyScalar(speed);
-      bullets.push({ mesh: bullet, vel, ttl: 2.0 });
-    }
-
-    document.addEventListener('mousedown', (e)=>{ if (e.button===0) shoot(); });
-
-    // Reload
-    document.addEventListener('keydown', (e)=>{
-      if (e.key.toLowerCase()==='r') { ammo = magSize; ammoEl.textContent = ammo; }
-    });
-
-    // Enemies
-    const enemies = []; // {mesh, hp}
-    const enemyGeo = new THREE.BoxGeometry(1,1,1);
-    const enemyMat = new THREE.MeshStandardMaterial({ color: 0xff3b3b, metalness: .2, roughness: .6 });
-
-    function spawnEnemy() {
-      const e = new THREE.Mesh(enemyGeo, enemyMat);
-      const radius = 50 + Math.random()*60;
-      const angle = Math.random()*Math.PI*2;
-      e.position.set(Math.cos(angle)*radius, 0.5, Math.sin(angle)*radius);
-      e.userData.head = new THREE.Vector3(0, 0.5, 0); // for headshot check
-      scene.add(e);
-      enemies.push({ mesh: e, hp: 2 });
-      enemyCountEl.textContent = enemies.length;
-    }
-
-    // Spawn loop
-    let spawnTimer = 0;
-
-    // Game over
-    let gameOver = false;
-    function endGame() {
-      gameOver = true;
-      controls.unlock();
-      showGameOver();
-    }
-
-    function showGameOver(){
-      const panel = document.getElementById('panel');
-      panel.innerHTML = `<h1>انتهت اللعبة</h1><p>نتيجتك: <b>${score}</b></p><button id="restartBtn">أعد المحاولة</button>`;
-      overlay.style.display = 'grid';
-      hud.style.display = 'none';
-      document.getElementById('restartBtn').addEventListener('click', ()=>{ location.reload(); });
-    }
-
-    // Simple obstacles
-    const crates = new THREE.Group();
-    const crateGeo = new THREE.BoxGeometry(2, 2, 2);
-    const crateMat = new THREE.MeshStandardMaterial({ color: 0x2a396e, metalness: .15, roughness: .85 });
-    for (let i=0;i<24;i++) {
-      const c = new THREE.Mesh(crateGeo, crateMat);
-      c.position.set((Math.random()-0.5)*120, 1, (Math.random()-0.5)*120);
-      crates.add(c);
-    }
-    scene.add(crates);
-
-    // Raycaster for headshots
-    const ray = new THREE.Raycaster();
-
-    // Main loop
-    let prev = performance.now();
-    function animate(now){
-      requestAnimationFrame(animate);
-      const delta = Math.min((now - prev)/1000, 0.05); // clamp for stability
-      prev = now;
-
-      if (!gameOver) update(delta);
-      renderer.render(scene, camera);
-    }
-
-    function update(delta){
-      // Movement
-      direction.set(0,0,0);
-      if (keys.w) direction.z -= 1;
-      if (keys.s) direction.z += 1;
-      if (keys.a) direction.x -= 1;
-      if (keys.d) direction.x += 1;
-      direction.normalize();
-
-      const moveSpeed = keys.shift ? 18 : 10;
-      const front = new THREE.Vector3();
-      const side = new THREE.Vector3();
-      camera.getWorldDirection(front);
-      front.y = 0; front.normalize();
-      side.crossVectors(front, new THREE.Vector3(0,1,0)).normalize();
-
-      const move = new THREE.Vector3();
-      move.addScaledVector(front, direction.z * moveSpeed * delta);
-      move.addScaledVector(side, -direction.x * moveSpeed * delta);
-
-      controls.getObject().position.add(move);
-
-      // Ground clamp
-      camera.position.y = 1.7;
-
-      // Jump (simple)
-      if (keys.space && canJump){ canJump = false; setTimeout(()=>{ canJump = true; }, 700); }
-
-      // Bullets update
-      for (let i=bullets.length-1;i>=0;i--){
-        const b = bullets[i];
-        b.mesh.position.addScaledVector(b.vel, delta/0.016);
-        b.ttl -= delta;
-        if (b.ttl <= 0){ scene.remove(b.mesh); bullets.splice(i,1); continue; }
-      }
-
-      // Enemies spawn
-      spawnTimer -= delta;
-      if (spawnTimer <= 0){
-        spawnEnemy();
-        spawnTimer = Math.max(0.4, 2.2 - score*0.03); // harder over time
-      }
-
-      // Enemies move towards player
-      const playerPos = camera.position.clone();
-      for (let i=enemies.length-1;i>=0;i--){
-        const e = enemies[i].mesh;
-        const toPlayer = playerPos.clone().sub(e.position);
-        const dist = toPlayer.length();
-        toPlayer.normalize();
-        e.position.addScaledVector(toPlayer, Math.min(6 + score*0.02, 12) * delta);
-
-        // Damage if close
-        if (dist < 1.2){
-          health -= 25*delta; // DPS
-          healthEl.textContent = Math.max(0, health|0);
-          if (health <= 0) { endGame(); break; }
-        }
-      }
-
-      // Bullet/enemy collision
-      for (let i=enemies.length-1;i>=0;i--){
-        const enemy = enemies[i];
-        const ep = enemy.mesh.position;
-        let hit = false; let headshot = false; let jHit = -1;
-        for (let j=0;j<bullets.length;j++){
-          const bp = bullets[j].mesh.position;
-          if (bp.distanceTo(ep) < 0.8){ hit = true; jHit = j; }
-          // Headshot check by raycast from camera on fire — approximate using distance to head offset
-          if (bp.distanceTo(ep.clone().add(enemy.mesh.userData.head)) < 0.45){ headshot = true; jHit = j; hit = true; }
-          if (hit) break;
-        }
-        if (hit){
-          if (jHit>=0){ scene.remove(bullets[jHit].mesh); bullets.splice(jHit,1); }
-          enemy.hp -= headshot ? 2 : 1;
-          if (enemy.hp <= 0){
-            score += headshot ? 2 : 1;
-            scoreEl.textContent = score;
-            scene.remove(enemy.mesh);
-            enemies.splice(i,1);
-            enemyCountEl.textContent = enemies.length;
-          }
-        }
-      }
-    }
-
-    // Resize
-    window.addEventListener('resize', ()=>{
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
-
-    // Start loop
-    animate(performance.now());
-  </script>
+    <script src="game.js"></script>
 </body>
 </html>
