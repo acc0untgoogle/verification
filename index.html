@@ -1,431 +1,438 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لعبة شوتر ثلاثية الأبعاد</title>
-    <style>
-        body { 
-            margin: 0; 
-            overflow: hidden; 
-            font-family: Arial, sans-serif;
-        }
-        canvas { 
-            display: block; 
-        }
-        #info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            color: white;
-            background: rgba(0,0,0,0.5);
-            padding: 10px;
-            border-radius: 5px;
-        }
-        #health {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            width: 200px;
-            height: 20px;
-            background: rgba(255,0,0,0.5);
-        }
-        #health-bar {
-            height: 100%;
-            width: 100%;
-            background: rgba(0,255,0,0.7);
-        }
-        #ammo {
-            position: absolute;
-            bottom: 50px;
-            left: 20px;
-            color: white;
-            font-size: 18px;
-            background: rgba(0,0,0,0.5);
-            padding: 5px 10px;
-            border-radius: 5px;
-        }
-        #game-over {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 48px;
-            background: rgba(0,0,0,0.7);
-            padding: 20px;
-            border-radius: 10px;
-            display: none;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>MiniStrike FF — Single File</title>
+  <style>
+    :root { --ui:#0b0d10; --fg:#e9eef2; --accent:#31d67b; }
+    html,body{margin:0;height:100%;overflow:hidden;background:#000;font-family:system-ui,-apple-system,Segoe UI,Roboto;}
+    #game{display:block;width:100%;height:100%;}
+    #start{
+      position:fixed;inset:auto 50% 40% 50%;transform:translate(-50%,-50%);
+      background:rgba(0,0,0,.7);color:#fff;border:2px solid #fff;border-radius:12px;
+      padding:14px 28px;font-size:18px;cursor:pointer;z-index:10;user-select:none;
+    }
+    #hud{
+      position:fixed;inset:0 0 auto 0;display:none;z-index:10;color:var(--fg);
+      pointer-events:none;font-weight:600;
+    }
+    #ammo{position:absolute;top:14px;left:16px;background:rgba(0,0,0,.45);padding:8px 12px;border-radius:10px}
+    #health{position:absolute;top:14px;right:16px;background:rgba(0,0,0,.45);padding:8px 12px;border-radius:10px}
+    #crosshair{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:22px;opacity:.8}
+    #hint{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);opacity:.8;background:rgba(0,0,0,.45);padding:6px 10px;border-radius:10px;font-size:12px}
+    /* شاشة تحميل */
+    #loading{position:fixed;inset:0;background:#000;display:none;align-items:center;justify-content:center;flex-direction:column;color:#fff;z-index:20}
+    #barWrap{width:min(520px,80vw);height:14px;background:#222;border-radius:10px;overflow:hidden;margin-top:10px}
+    #bar{height:100%;width:0;background:var(--accent);}
+    /* وميض إطلاق */
+    .muzzleFlash{position:fixed;width:100%;height:100%;inset:0;background:radial-gradient(circle at 50% 50%, rgba(255,236,150,.18), transparent 50%);opacity:0;transition:opacity .08s;pointer-events:none;z-index:5}
+    .muzzleFlash.show{opacity:1}
+  </style>
 </head>
 <body>
-    <div id="info">
-        لعبة شوتر ثلاثية الأبعاد | WASD للحركة | مسافة للقفز | زر الفأرة لإطلاق النار
-    </div>
-    <div id="health">
-        <div id="health-bar"></div>
-    </div>
-    <div id="ammo">الذخيرة: ∞</div>
-    <div id="game-over">انتهت اللعبة! <br> <button onclick="resetGame()">إعادة المحاولة</button></div>
+  <div id="start">انقر للعب</div>
+  <div id="loading">
+    <div id="loadText">جاري التحميل… 0%</div>
+    <div id="barWrap"><div id="bar"></div></div>
+  </div>
+  <div id="hud">
+    <div id="ammo">0/0</div>
+    <div id="health">❤ 100</div>
+    <div id="crosshair">+</div>
+    <div id="hint">WASD حركة • Shift ركض • زر أيسر إطلاق • زر أيمن ADS • R إعادة التذخير • G وميض</div>
+  </div>
+  <div class="muzzleFlash" id="flash"></div>
+  <canvas id="game"></canvas>
 
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/controls/PointerLockControls.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/loaders/GLTFLoader.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/three@0.132.2/examples/js/misc/FirstPersonControls.js"></script>
+  <script type="module">
+    // ===== Imports =====
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.155/build/three.module.js';
+    import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.155/examples/jsm/controls/PointerLockControls.js';
+    import { GLTFLoader } from 'https://cdn.jsdelivr.net/npm/three@0.155/examples/jsm/loaders/GLTFLoader.js';
+    import { FBXLoader } from 'https://cdn.jsdelivr.net/npm/three@0.155/examples/jsm/loaders/FBXLoader.js';
 
-    <script>
-        // المشهد الأساسي
-        const scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x87CEEB); // لون السماء
-        
-        // الكاميرا
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        camera.position.y = 10;
-        
-        // الرسام
-        const renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        renderer.shadowMap.enabled = true;
-        document.body.appendChild(renderer.domElement);
-        
-        // التحكم بالمؤشر
-        const controls = new THREE.PointerLockControls(camera, document.body);
-        
-        // الإضاءة
-        const ambientLight = new THREE.AmbientLight(0x404040);
-        scene.add(ambientLight);
-        
-        const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-        directionalLight.position.set(1, 1, 1);
-        directionalLight.castShadow = true;
-        scene.add(directionalLight);
-        
-        // الأرض
-        const groundGeometry = new THREE.PlaneGeometry(100, 100);
-        const groundMaterial = new THREE.MeshStandardMaterial({ color: 0x228B22 });
-        const ground = new THREE.Mesh(groundGeometry, groundMaterial);
-        ground.rotation.x = -Math.PI / 2;
-        ground.receiveShadow = true;
-        scene.add(ground);
-        
-        // الجدران أو العوائق
-        const wallGeometry = new THREE.BoxGeometry(10, 10, 1);
-        const wallMaterial = new THREE.MeshStandardMaterial({ color: 0x8B4513 });
-        
-        for (let i = 0; i < 5; i++) {
-            const wall = new THREE.Mesh(wallGeometry, wallMaterial);
-            wall.position.x = Math.random() * 80 - 40;
-            wall.position.z = Math.random() * 80 - 40;
-            wall.position.y = 5;
-            wall.castShadow = true;
-            wall.receiveShadow = true;
-            scene.add(wall);
-        }
-        
-        // اللاعب
-        const playerGeometry = new THREE.BoxGeometry(1, 2, 1);
-        const playerMaterial = new THREE.MeshStandardMaterial({ color: 0x0000FF });
-        const player = new THREE.Mesh(playerGeometry, playerMaterial);
-        player.position.y = 2;
-        player.castShadow = true;
-        scene.add(player);
-        
-        // السلاح
-        const weaponGeometry = new THREE.BoxGeometry(0.5, 0.2, 1.5);
-        const weaponMaterial = new THREE.MeshStandardMaterial({ color: 0x555555 });
-        const weapon = new THREE.Mesh(weaponGeometry, weaponMaterial);
-        weapon.position.set(0.5, -0.3, -1);
-        camera.add(weapon);
-        
-        // متغيرات اللعبة
-        const enemies = [];
-        const bullets = [];
-        let health = 100;
-        let score = 0;
-        let gameOver = false;
-        let enemySpawnInterval;
-        
-        // حركة اللاعب
-        const moveSpeed = 0.2;
-        const jumpForce = 0.5;
-        let velocityY = 0;
-        let isOnGround = false;
-        
-        // إضافة الأعداء
-        function spawnEnemy() {
-            if (gameOver) return;
-            
-            const enemyGeometry = new THREE.BoxGeometry(1, 2, 1);
-            const enemyMaterial = new THREE.MeshStandardMaterial({ color: 0xFF0000 });
-            const enemy = new THREE.Mesh(enemyGeometry, enemyMaterial);
-            
-            // وضع العدو في مكان عشوائي بعيد عن اللاعب
-            let x, z;
-            do {
-                x = Math.random() * 80 - 40;
-                z = Math.random() * 80 - 40;
-            } while (Math.sqrt(x*x + z*z) < 15); // التأكد من أنه ليس قريبًا جدًا
-            
-            enemy.position.set(x, 1, z);
-            enemy.castShadow = true;
-            
-            // خصائص العدو
-            enemy.health = 100;
-            enemy.speed = 0.05 + Math.random() * 0.05;
-            enemy.damage = 10;
-            enemy.lastShotTime = 0;
-            enemy.shotDelay = 2000 + Math.random() * 1000; // بين 2-3 ثواني
-            
-            scene.add(enemy);
-            enemies.push(enemy);
-        }
-        
-        // إطلاق النار
-        function shoot() {
-            if (gameOver) return;
-            
-            const bulletGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-            const bulletMaterial = new THREE.MeshStandardMaterial({ color: 0xFFFF00 });
-            const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
-            
-            // وضع الرصاصة أمام الكاميرا
-            bullet.position.copy(camera.position);
-            
-            // تحديد اتجاه الرصاصة
-            const direction = new THREE.Vector3();
-            camera.getWorldDirection(direction);
-            bullet.userData.direction = direction.clone();
-            
-            bullet.castShadow = true;
-            scene.add(bullet);
-            bullets.push(bullet);
-            
-            // تأثير صوتي (يمكن إضافة صوت حقيقي هنا)
-            console.log("Bang!");
-        }
-        
-        // تحديث حركة الأعداء
-        function updateEnemies() {
-            const currentTime = Date.now();
-            
-            enemies.forEach((enemy, index) => {
-                if (enemy.health <= 0) {
-                    scene.remove(enemy);
-                    enemies.splice(index, 1);
-                    score += 10;
-                    return;
-                }
-                
-                // تحرك نحو اللاعب
-                const direction = new THREE.Vector3();
-                direction.subVectors(player.position, enemy.position).normalize();
-                enemy.position.x += direction.x * enemy.speed;
-                enemy.position.z += direction.z * enemy.speed;
-                
-                // إطلاق النار على اللاعب
-                if (currentTime - enemy.lastShotTime > enemy.shotDelay) {
-                    enemy.lastShotTime = currentTime;
-                    
-                    // حساب إذا كان اللاعب في مرمى النظر
-                    const toPlayer = new THREE.Vector3().subVectors(player.position, enemy.position).normalize();
-                    const enemyDirection = new THREE.Vector3(0, 0, -1).applyQuaternion(enemy.quaternion);
-                    
-                    if (toPlayer.dot(enemyDirection) > 0.9) { // زاوية رؤية 25 درجة تقريبًا
-                        const enemyBulletGeometry = new THREE.SphereGeometry(0.1, 16, 16);
-                        const enemyBulletMaterial = new THREE.MeshStandardMaterial({ color: 0xFF4500 });
-                        const enemyBullet = new THREE.Mesh(enemyBulletGeometry, enemyBulletMaterial);
-                        
-                        enemyBullet.position.copy(enemy.position);
-                        enemyBullet.position.y += 1; // إطلاق من مستوى الرأس
-                        
-                        const bulletDirection = new THREE.Vector3().subVectors(player.position, enemyBullet.position).normalize();
-                        enemyBullet.userData.direction = bulletDirection;
-                        enemyBullet.userData.isEnemyBullet = true;
-                        
-                        scene.add(enemyBullet);
-                        bullets.push(enemyBullet);
-                    }
-                }
-                
-                // تدوير العدو لمواجهة اللاعب
-                enemy.lookAt(player.position);
-            });
-        }
-        
-        // تحديث حركة الرصاصات
-        function updateBullets() {
-            bullets.forEach((bullet, index) => {
-                // حركة الرصاصة
-                bullet.position.x += bullet.userData.direction.x * 0.5;
-                bullet.position.y += bullet.userData.direction.y * 0.5;
-                bullet.position.z += bullet.userData.direction.z * 0.5;
-                
-                // التحقق من اصطدام الرصاصة بالعدو (إذا كانت من اللاعب)
-                if (!bullet.userData.isEnemyBullet) {
-                    enemies.forEach(enemy => {
-                        if (bullet.position.distanceTo(enemy.position) < 1) {
-                            enemy.health -= 25;
-                            scene.remove(bullet);
-                            bullets.splice(index, 1);
-                        }
-                    });
-                }
-                // التحقق من اصطدام الرصاصة باللاعب (إذا كانت من العدو)
-                else if (bullet.position.distanceTo(player.position) < 1) {
-                    health -= 10;
-                    updateHealthBar();
-                    scene.remove(bullet);
-                    bullets.splice(index, 1);
-                    
-                    if (health <= 0) {
-                        endGame();
-                    }
-                }
-                
-                // إزالة الرصاصة إذا تجاوزت الحدود
-                if (Math.abs(bullet.position.x) > 50 || 
-                    Math.abs(bullet.position.y) > 50 || 
-                    Math.abs(bullet.position.z) > 50) {
-                    scene.remove(bullet);
-                    bullets.splice(index, 1);
-                }
-            });
-        }
-        
-        // تحديث شريط الصحة
-        function updateHealthBar() {
-            const healthBar = document.getElementById('health-bar');
-            healthBar.style.width = `${health}%`;
-            
-            if (health < 30) {
-                healthBar.style.background = 'rgba(255,0,0,0.7)';
-            } else if (health < 60) {
-                healthBar.style.background = 'rgba(255,165,0,0.7)';
-            } else {
-                healthBar.style.background = 'rgba(0,255,0,0.7)';
-            }
-        }
-        
-        // إنهاء اللعبة
-        function endGame() {
-            gameOver = true;
-            document.getElementById('game-over').style.display = 'block';
-            clearInterval(enemySpawnInterval);
-        }
-        
-        // إعادة تشغيل اللعبة
-        function resetGame() {
-            health = 100;
-            score = 0;
-            gameOver = false;
-            updateHealthBar();
-            document.getElementById('game-over').style.display = 'none';
-            
-            // إزالة جميع الأعداء والرصاصات
-            enemies.forEach(enemy => scene.remove(enemy));
-            bullets.forEach(bullet => scene.remove(bullet));
-            enemies.length = 0;
-            bullets.length = 0;
-            
-            // إعادة تعيين موقع اللاعب
-            player.position.set(0, 2, 0);
-            camera.position.set(0, 10, 0);
-            controls.getObject().position.set(0, 10, 0);
-            
-            // إعادة تشغيل موجة الأعداء
-            enemySpawnInterval = setInterval(spawnEnemy, 3000);
-        }
-        
-        // التحكم باللوحة المفاتيح
-        const keys = {};
-        document.addEventListener('keydown', (event) => {
-            keys[event.code] = true;
-            
-            // القفز
-            if (event.code === 'Space' && isOnGround) {
-                velocityY = jumpForce;
-                isOnGround = false;
-            }
-            
-            // قفل المؤشر عند النقر
-            if (event.code === 'Enter' && !controls.isLocked) {
-                controls.lock();
-            }
+    // ===== UI refs =====
+    const canvas = document.getElementById('game');
+    const startBtn = document.getElementById('start');
+    const hud = document.getElementById('hud');
+    const ammoEl = document.getElementById('ammo');
+    const hpEl = document.getElementById('health');
+    const loading = document.getElementById('loading');
+    const loadText = document.getElementById('loadText');
+    const bar = document.getElementById('bar');
+    const flash = document.getElementById('flash');
+
+    // ===== Scene setup =====
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x101215);
+    const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, .1, 1000);
+    const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
+    renderer.setSize(innerWidth, innerHeight);
+    renderer.shadowMap.enabled = true;
+
+    // Lights
+    const hemi = new THREE.HemisphereLight(0xffffff, 0x223344, .65); scene.add(hemi);
+    const sun = new THREE.DirectionalLight(0xffffff, .9); sun.position.set(15,25,10); sun.castShadow = true; scene.add(sun);
+
+    // Controls / player
+    const controls = new PointerLockControls(camera, canvas);
+    camera.position.set(0, 1.7, 6);
+
+    // ===== Loaders =====
+    const manager = new THREE.LoadingManager();
+    const gltf = new GLTFLoader(manager);
+    const fbx = new FBXLoader(manager);
+
+    manager.onProgress = (url, loaded, total) => {
+      const pct = total ? Math.min(100, (loaded/total)*100) : 10;
+      bar.style.width = pct.toFixed(0) + '%';
+      loadText.textContent = `جاري التحميل… ${pct.toFixed(0)}%`;
+    };
+
+    // ===== Player state =====
+    const keys = new Set();
+    let running = false;
+    let ads = false;
+    let playerHP = 100;
+
+    const playerObj = new THREE.Object3D(); // physics proxy
+    playerObj.position.set(0, 1.0, 0);
+    scene.add(playerObj);
+
+    // ===== Weapon =====
+    const weapon = {
+      group: new THREE.Group(),
+      muzzle: new THREE.Object3D(),
+      damage: 25,
+      fireRate: 9, // bullets per second
+      clipSize: 30,
+      reserve: 120,
+      inClip: 30,
+      reloading: false,
+      lastShot: 0,
+      adsFov: 55,
+      hipFov: 75,
+      load(url){
+        return new Promise((resolve)=>{
+          const ext = (url.split('.').pop()||'').toLowerCase();
+          const on = (obj)=>{
+            this.group.clear();
+            const root = obj.scene || obj;
+            root.traverse(o=>{ o.castShadow = true; });
+            this.group.add(root);
+            this.muzzle.position.set(0.12,-0.07,-0.6);
+            this.group.add(this.muzzle);
+            resolve();
+          };
+          (ext==='fbx'? fbx : gltf).load(url, on, undefined, _=>{
+            // fallback weapon (box)
+            const g = new THREE.Mesh(
+              new THREE.BoxGeometry(.25,.12,.7),
+              new THREE.MeshStandardMaterial({color:0x222222, metalness:.2, roughness:.6})
+            );
+            this.group.clear(); this.group.add(g);
+            this.muzzle.position.set(0.12,-0.02,-0.35);
+            this.group.add(this.muzzle);
+            resolve();
+          });
         });
-        
-        document.addEventListener('keyup', (event) => {
-            keys[event.code] = false;
-        });
-        
-        // التحكم بالفأرة
-        document.addEventListener('click', () => {
-            if (controls.isLocked) {
-                shoot();
-            } else {
-                controls.lock();
-            }
-        });
-        
-        // تحديث الحركة
-        function updateMovement() {
-            if (!controls.isLocked || gameOver) return;
-            
-            const direction = new THREE.Vector3();
-            const frontVector = new THREE.Vector3(0, 0, -1).applyQuaternion(camera.quaternion);
-            const sideVector = new THREE.Vector3(-1, 0, 0).applyQuaternion(camera.quaternion);
-            
-            if (keys['KeyW']) direction.add(frontVector);
-            if (keys['KeyS']) direction.sub(frontVector);
-            if (keys['KeyA']) direction.add(sideVector);
-            if (keys['KeyD']) direction.sub(sideVector);
-            
-            direction.normalize();
-            
-            if (direction.length() > 0) {
-                player.position.x += direction.x * moveSpeed;
-                player.position.z += direction.z * moveSpeed;
-            }
-            
-            // الجاذبية
-            velocityY -= 0.02;
-            player.position.y += velocityY;
-            
-            // التحقق من الاصطدام بالأرض
-            if (player.position.y <= 1) {
-                player.position.y = 1;
-                velocityY = 0;
-                isOnGround = true;
-            }
-            
-            // تحديث موقع الكاميرا لاتباع اللاعب
-            camera.position.x = player.position.x;
-            camera.position.z = player.position.z;
-            controls.getObject().position.copy(camera.position);
+      },
+      update(dt){
+        // simple sway
+        const t = performance.now()*0.001;
+        this.group.position.x = Math.sin(t*6)*0.003;
+        this.group.position.y = Math.cos(t*8)*0.003;
+        // ADS fov blend
+        camera.fov += ((ads? this.adsFov : this.hipFov) - camera.fov) * 10*dt;
+        camera.updateProjectionMatrix();
+      },
+      canShoot(){
+        if(this.reloading || this.inClip<=0) return false;
+        const now = performance.now()*0.001;
+        return (now - this.lastShot) >= (1/this.fireRate);
+      },
+      shoot(origin, dir){
+        this.lastShot = performance.now()*0.001;
+        this.inClip--;
+        updateAmmo();
+        // recoil
+        camera.rotation.x -= 0.01;
+        // flash UI
+        flash.classList.add('show'); setTimeout(()=>flash.classList.remove('show'), 50);
+        // hitscan
+        const hit = hitscan(origin, dir, 200);
+        if(hit){
+          spawnSpark(hit.point);
+          const root = findDamageRoot(hit.object);
+          if(root){ applyDamage(root, this.damage); }
         }
-        
-        // دورة اللعبة
-        function gameLoop() {
-            if (!gameOver) {
-                updateMovement();
-                updateEnemies();
-                updateBullets();
-            }
-            
-            renderer.render(scene, camera);
-            requestAnimationFrame(gameLoop);
-        }
-        
-        // بدء اللعبة
-        enemySpawnInterval = setInterval(spawnEnemy, 3000);
-        gameLoop();
-        
-        // تعديل الحجم عند تغيير حجم النافذة
-        window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
+      },
+      reload(){
+        if(this.reloading || this.inClip===this.clipSize || this.reserve<=0) return;
+        this.reloading = true;
+        setTimeout(()=>{
+          const need = this.clipSize - this.inClip;
+          const take = Math.min(need, this.reserve);
+          this.inClip += take; this.reserve -= take;
+          updateAmmo();
+          this.reloading = false;
+        }, 900);
+      }
+    };
+    function updateAmmo(){ ammoEl.textContent = `${weapon.inClip}/${weapon.reserve}`; }
+
+    // Attach weapon to camera
+    camera.add(weapon.group);
+    weapon.group.position.set(0.25, -0.18, -0.4);
+    weapon.group.rotation.set(0,0,0);
+
+    // ===== Map load with fallback =====
+    async function loadMap(){
+      return new Promise((resolve)=>{
+        gltf.load('assets/map.glb', (g)=>{
+          g.scene.traverse(o=>{ o.receiveShadow = true; o.castShadow = !!o.castShadow; o.userData.static = true; });
+          scene.add(g.scene);
+          resolve(true);
+        }, undefined, ()=>{
+          // fallback map
+          const floor = new THREE.Mesh(new THREE.PlaneGeometry(120,120), new THREE.MeshStandardMaterial({color:0x3c3c42}));
+          floor.rotation.x = -Math.PI/2; floor.receiveShadow = true; scene.add(floor);
+          for(let i=0;i<10;i++){
+            const b = new THREE.Mesh(new THREE.BoxGeometry(2,2,2), new THREE.MeshStandardMaterial({color:0x2a2f36}));
+            b.position.set((Math.random()-0.5)*50,1,(Math.random()-0.5)*50);
+            b.castShadow = b.receiveShadow = true;
+            b.userData.hittable = true;
+            scene.add(b);
+          }
+          resolve(false);
         });
-    </script>
+      });
+    }
+
+    // ===== Bots (enemies) =====
+    const bots = [];
+    const botGeom = new THREE.CapsuleGeometry(0.4, 1.1, 6, 12);
+    const botMat = new THREE.MeshStandardMaterial({color:0xc0392b});
+    let botModel = null;
+
+    function makeBotMesh(){
+      if(botModel){
+        const m = botModel.clone();
+        m.traverse(o=>{ o.castShadow = true; });
+        return m;
+      }
+      const m = new THREE.Mesh(botGeom, botMat);
+      return m;
+    }
+
+    function spawnBot(pos){
+      const root = new THREE.Object3D();
+      const mesh = makeBotMesh();
+      root.add(mesh);
+      root.position.copy(pos);
+      root.userData.hittable = true;
+      root.userData.damageable = true;
+      root.userData.health = 120; // أعداء أقوياء
+      scene.add(root);
+      bots.push({root, vel:new THREE.Vector3(), strafeSign: Math.random()<.5? -1:1, cooldown:0});
+      return root;
+    }
+
+    function applyDamage(root, dmg){
+      if(!root.userData.damageable) return;
+      root.userData.health -= dmg;
+      if(root.userData.health <= 0){
+        // death
+        spawnSpark(root.position);
+        scene.remove(root);
+        const i = bots.findIndex(b=>b.root===root);
+        if(i>=0) bots.splice(i,1);
+      }
+    }
+
+    function findDamageRoot(o){
+      let cur = o;
+      while(cur && !cur.userData.damageable && cur.parent) cur = cur.parent;
+      return cur && cur.userData.damageable ? cur : null;
+    }
+
+    async function loadBotModel(){
+      return new Promise((resolve)=>{
+        fbx.load('assets/character.fbx', (obj)=>{
+          botModel = obj;
+          resolve();
+        }, undefined, ()=> resolve()); // ignore errors (fallback capsule)
+      });
+    }
+
+    // ===== Raycast / VFX =====
+    const ray = new THREE.Raycaster();
+    function hitscan(origin, dir, dist=200){
+      ray.set(origin, dir.normalize());
+      ray.far = dist;
+      const hits = ray.intersectObjects(scene.children, true);
+      return hits.find(h=>h.object && h.object !== weapon.group);
+    }
+    const sparkGeo = new THREE.SphereGeometry(0.03, 6, 6);
+    const sparkMat = new THREE.MeshBasicMaterial({color:0xffffaa});
+    function spawnSpark(point){
+      const m = new THREE.Mesh(sparkGeo, sparkMat);
+      m.position.copy(point);
+      scene.add(m);
+      setTimeout(()=>scene.remove(m), 120);
+    }
+
+    // ===== Input =====
+    addEventListener('keydown', e=>{
+      if(e.code==='KeyG'){ flash.classList.add('show'); setTimeout(()=>flash.classList.remove('show'),60); }
+      if(e.code==='KeyR'){ weapon.reload(); }
+      if(e.code==='ShiftLeft'){ running = true; }
+      keys.add(e.code);
+    });
+    addEventListener('keyup', e=>{
+      if(e.code==='ShiftLeft'){ running = false; }
+      keys.delete(e.code);
+    });
+
+    let mouseDown = false;
+    addEventListener('mousedown', e=>{
+      if(e.button===0){ mouseDown = true; }
+      if(e.button===2){ ads = true; }
+    });
+    addEventListener('mouseup', e=>{
+      if(e.button===0){ mouseDown = false; }
+      if(e.button===2){ ads = false; }
+    });
+    addEventListener('contextmenu', e=>e.preventDefault()); // disable default menu
+
+    // ===== Game loop =====
+    const clock = new THREE.Clock();
+    function update(dt){
+      // player kinematics (very light fake physics)
+      const speed = (running? 7.5 : 4.0);
+      const dir = new THREE.Vector3();
+      const fwd = new THREE.Vector3();
+      controls.getDirection(fwd); fwd.y = 0; fwd.normalize();
+      const right = new THREE.Vector3().crossVectors(fwd, new THREE.Vector3(0,1,0)).negate();
+
+      if(keys.has('KeyW')) dir.add(fwd);
+      if(keys.has('KeyS')) dir.sub(fwd);
+      if(keys.has('KeyA')) dir.sub(right);
+      if(keys.has('KeyD')) dir.add(right);
+
+      dir.normalize().multiplyScalar(speed*dt);
+      playerObj.position.add(dir);
+      camera.position.set(playerObj.position.x, 1.7, playerObj.position.z);
+
+      // shooting
+      if(mouseDown && weapon.canShoot()){
+        const origin = camera.getWorldPosition(new THREE.Vector3());
+        const to = camera.getWorldDirection(new THREE.Vector3());
+        weapon.shoot(origin, to);
+      }
+
+      // weapon update
+      weapon.update(dt);
+
+      // bots AI: seek + strafe + separation + stop when close
+      const toPlayer = new THREE.Vector3();
+      for(const b of bots){
+        toPlayer.copy(playerObj.position).sub(b.root.position);
+        const dist = toPlayer.length();
+        toPlayer.normalize();
+
+        // Separation
+        const sep = new THREE.Vector3();
+        for(const other of bots){
+          if(other===b) continue;
+          const d = b.root.position.distanceTo(other.root.position);
+          if(d<2){ sep.add(new THREE.Vector3().subVectors(b.root.position, other.root.position).normalize().multiplyScalar(1.5/d)); }
+        }
+
+        // strafe
+        const rightV = new THREE.Vector3().crossVectors(new THREE.Vector3(0,1,0), toPlayer).normalize().multiplyScalar(0.6*b.strafeSign);
+
+        // final vel
+        const targetV = new THREE.Vector3();
+        if(dist>3) targetV.add(toPlayer.multiplyScalar( (dist>15)? 6.0 : 3.5 ));
+        targetV.add(rightV).add(sep);
+        b.vel.lerp(targetV, 3*dt);
+        b.root.position.addScaledVector(b.vel, dt);
+
+        // face player
+        b.root.lookAt(playerObj.position.x, b.root.position.y, playerObj.position.z);
+
+        // attack if close (melee)
+        b.cooldown -= dt;
+        if(dist<2 && b.cooldown<=0){
+          damagePlayer(18);
+          b.cooldown = 0.9;
+        }
+      }
+    }
+
+    function damagePlayer(dmg){
+      playerHP = Math.max(0, playerHP - dmg);
+      hpEl.textContent = `❤ ${playerHP}`;
+      if(playerHP<=0){
+        // simple respawn
+        playerHP = 100; hpEl.textContent = '❤ 100';
+        playerObj.position.set(0,1,0);
+      }
+    }
+
+    function loop(){
+      requestAnimationFrame(loop);
+      const dt = Math.min(clock.getDelta(), 0.05);
+      update(dt);
+      renderer.render(scene, camera);
+    }
+
+    // ===== Start flow =====
+    startBtn.addEventListener('click', async ()=>{
+      startBtn.style.display = 'none';
+      loading.style.display = 'flex';
+
+      // queue critical loads
+      const tasks = [
+        loadMap(),
+        weapon.load('assets/weapon.fbx'),
+        loadBotModel()
+      ];
+      await Promise.all(tasks);
+
+      // spawn enemies
+      for(let i=0;i<6;i++){
+        const angle = (i/6)*Math.PI*2;
+        const r = 12 + Math.random()*8;
+        spawnBot(new THREE.Vector3(Math.cos(angle)*r, 0, Math.sin(angle)*r));
+      }
+
+      hud.style.display = 'block';
+      controls.lock();
+      loading.style.display = 'none';
+      updateAmmo();
+      loop();
+    });
+
+    controls.addEventListener('unlock', ()=>{
+      // show start again as pause
+      startBtn.textContent = 'متابعة';
+      startBtn.style.display = 'block';
+      hud.style.display = 'none';
+    });
+    controls.addEventListener('lock', ()=>{
+      startBtn.style.display = 'none';
+      hud.style.display = 'block';
+    });
+
+    // ===== Resize =====
+    addEventListener('resize', ()=>{
+      camera.aspect = innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth, innerHeight);
+    });
+  </script>
 </body>
 </html>
