@@ -1,18 +1,434 @@
-
 <!DOCTYPE html>
 <html lang="ar">
 <head>
-  <meta charset="UTF-8">
-  <title>تلك الغرفة مجددًا</title>
-  <style>
-    body { margin: 0; padding: 0; background: #111; direction: rtl; }
-    canvas { display: block; margin: auto; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>بيئة اللعبة الثنائية الأبعاد</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            margin-top: 20px;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .game-wrapper {
+            position: relative;
+            margin: 0 auto;
+            width: 600px;
+            height: 400px;
+            border: 3px solid #00b4d8;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(0, 180, 216, 0.5);
+        }
+        
+        canvas {
+            background: linear-gradient(to bottom, #1a1a2e, #16213e);
+            display: block;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+            gap: 15px;
+        }
+        
+        button {
+            padding: 10px 20px;
+            background: linear-gradient(to right, #00b4d8, #0077b6);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0, 180, 216, 0.4);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 180, 216, 0.6);
+        }
+        
+        .instructions {
+            margin-top: 20px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            border-left: 4px solid #00b4d8;
+        }
+        
+        h2 {
+            color: #00b4d8;
+            margin-bottom: 10px;
+        }
+        
+        ul {
+            list-style-type: none;
+            padding-left: 20px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+            position: relative;
+        }
+        
+        li:before {
+            content: "•";
+            color: #00b4d8;
+            position: absolute;
+            left: -15px;
+        }
+        
+        .key {
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid #00b4d8;
+            font-family: monospace;
+            margin: 0 3px;
+        }
+        
+        footer {
+            margin-top: 30px;
+            text-align: center;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+        }
+    </style>
 </head>
 <body>
-  <script src="https://cdn.jsdelivr.net/npm/phaser@3/dist/phaser.js"></script>
-  <script src="scripts/levels.js"></script>
-  <script src="scripts/menu.js"></script>
-  <script src="scripts/game.js"></script>
+    <header>
+        <h1>بيئة اللعبة الثنائية الأبعاد</h1>
+        <p>تحكم في اللاعب وتجنب العقبات للوصول إلى الباب</p>
+    </header>
+    
+    <div class="container">
+        <div class="game-wrapper">
+            <canvas id="gameCanvas" width="600" height="400"></canvas>
+        </div>
+        
+        <div class="controls">
+            <button id="resetBtn">إعادة التعيين</button>
+            <button id="toggleBtn">إخفاء التعليمات</button>
+        </div>
+        
+        <div class="instructions" id="instructions">
+            <h2>تعليمات اللعبة</h2>
+            <ul>
+                <li>استخدم مفاتيح الأسهم <span class="key">←</span> <span class="key">→</span> للحركة يمينًا ويسارًا</li>
+                <li>استخدم مفتاح <span class="key">Space</span> للقفز</li>
+                <li>تجنب المسامير الحادة (اللون الأحمر)</li>
+                <li>اقفز على المنصات للوصول إلى الباب (اللون الأخضر)</li>
+                <li>اضغط على زر إعادة التعيين لبدء اللعبة من جديد</li>
+            </ul>
+        </div>
+    </div>
+    
+    <footer>
+        <p>تم تطوير اللعبة باستخدام HTML5 Canvas - © 2023</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+            const resetBtn = document.getElementById('resetBtn');
+            const toggleBtn = document.getElementById('toggleBtn');
+            const instructions = document.getElementById('instructions');
+            
+            // تعريف بيانات اللعبة
+            const gameData = {
+                width: 600,
+                height: 400,
+                platforms: [
+                    {x: 0, y: 360, w: 600, h: 40},
+                    {x: 150, y: 300, w: 100, h: 16},
+                    {x: 260, y: 260, w: 100, h: 16},
+                    {x: 360, y: 300, w: 100, h: 16}
+                ],
+                spikes: [
+                    {x: 320, y: 344, w: 40, h: 16}
+                ],
+                door: {x: 560, y: 320, w: 20, h: 60}
+            };
+            
+            // تعريف اللاعب
+            const player = {
+                x: 50,
+                y: 300,
+                width: 20,
+                height: 30,
+                speed: 4,
+                velX: 0,
+                velY: 0,
+                jumping: false,
+                grounded: false,
+                color: '#4cc9f0'
+            };
+            
+            const keys = {};
+            const gravity = 0.5;
+            const friction = 0.8;
+            
+            // رسم المنصات
+            function drawPlatforms() {
+                gameData.platforms.forEach(platform => {
+                    ctx.fillStyle = '#f72585';
+                    ctx.fillRect(platform.x, platform.y, platform.w, platform.h);
+                    
+                    // إضافة تأثير ثلاثي الأبعاد
+                    ctx.fillStyle = '#b5179e';
+                    ctx.fillRect(platform.x, platform.y, platform.w, 4);
+                    ctx.fillRect(platform.x, platform.y, 4, platform.h);
+                });
+            }
+            
+            // رسم المسامير
+            function drawSpikes() {
+                gameData.spikes.forEach(spike => {
+                    ctx.fillStyle = '#e63946';
+                    ctx.fillRect(spike.x, spike.y, spike.w, spike.h);
+                    
+                    // رسم شكل المسامير
+                    ctx.beginPath();
+                    ctx.moveTo(spike.x, spike.y + spike.h);
+                    ctx.lineTo(spike.x + spike.w/2, spike.y);
+                    ctx.lineTo(spike.x + spike.w, spike.y + spike.h);
+                    ctx.closePath();
+                    ctx.fillStyle = '#e63946';
+                    ctx.fill();
+                });
+            }
+            
+            // رسم الباب
+            function drawDoor() {
+                const door = gameData.door;
+                ctx.fillStyle = '#2a9d8f';
+                ctx.fillRect(door.x, door.y, door.w, door.h);
+                
+                // تفاصيل الباب
+                ctx.fillStyle = '#264653';
+                ctx.fillRect(door.x + 3, door.y + 5, door.w - 6, door.h - 10);
+                
+                ctx.fillStyle = '#e9c46a';
+                ctx.beginPath();
+                ctx.arc(door.x + door.w - 5, door.y + door.h/2, 4, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            // رسم اللاعب
+            function drawPlayer() {
+                ctx.fillStyle = player.color;
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+                
+                // إضافة تفاصيل للاعب
+                ctx.fillStyle = '#3a0ca3';
+                ctx.fillRect(player.x + 4, player.y + 5, player.width - 8, 8);
+                ctx.fillRect(player.x + 4, player.y + 18, player.width - 8, 8);
+            }
+            
+            // تحديث اللاعب
+            function updatePlayer() {
+                // تطبيق الجاذبية
+                if (player.jumping && !player.grounded) {
+                    player.velY += gravity;
+                }
+                
+                player.grounded = false;
+                
+                // التحقق من التصادم مع المنصات
+                gameData.platforms.forEach(platform => {
+                    const dir = collisionCheck(player, platform);
+                    
+                    if (dir === "left" || dir === "right") {
+                        player.velX = 0;
+                    } else if (dir === "bottom") {
+                        player.jumping = false;
+                        player.grounded = true;
+                    } else if (dir === "top") {
+                        player.velY *= -0.5; // ارتداد بسيط
+                    }
+                });
+                
+                // التحقق من التصادم مع المسامير
+                gameData.spikes.forEach(spike => {
+                    if (collisionCheck(player, spike)) {
+                        resetPlayer();
+                    }
+                });
+                
+                // التحقق من الوصول للباب
+                if (collisionCheck(player, gameData.door)) {
+                    alert('مبروك! لقد وصلت إلى الباب!');
+                    resetPlayer();
+                }
+                
+                // تطبيق الاحتكاك
+                player.velX *= friction;
+                
+                // تطبيق الحركة
+                player.x += player.velX;
+                player.y += player.velY;
+                
+                // منع اللاعب من الخروج من الحافة اليسرى
+                if (player.x < 0) {
+                    player.x = 0;
+                }
+                
+                // منع اللاعب من الخروج من الحافة اليمنى
+                if (player.x > canvas.width - player.width) {
+                    player.x = canvas.width - player.width;
+                }
+                
+                // منع اللاعب من السقوط خارج اللعبة
+                if (player.y > canvas.height) {
+                    resetPlayer();
+                }
+            }
+            
+            // التحكم في الحركة
+            function handleMovement() {
+                if (keys[37] || keys[65]) { // اليسار
+                    if (player.velX > -player.speed) {
+                        player.velX--;
+                    }
+                }
+                
+                if (keys[39] || keys[68]) { // اليمين
+                    if (player.velX < player.speed) {
+                        player.velX++;
+                    }
+                }
+                
+                if ((keys[38] || keys[32] || keys[87]) && !player.jumping && player.grounded) { // القفز
+                    player.jumping = true;
+                    player.grounded = false;
+                    player.velY = -12;
+                }
+            }
+            
+            // فحص التصادم
+            function collisionCheck(obj1, obj2) {
+        const vX = (obj1.x + obj1.width / 2) - (obj2.x + obj2.w / 2);
+        const vY = (obj1.y + obj1.height / 2) - (obj2.y + obj2.h / 2);
+        
+        // جمع نصف العرض والارتفاع
+        const hWidths = (obj1.width / 2) + (obj2.w / 2);
+        const hHeights = (obj1.height / 2) + (obj2.h / 2);
+        
+        let direction = null;
+        
+        // إذا كان الجسمان متقاطعان
+        if (Math.abs(vX) < hWidths && Math.abs(vY) < hHeights) {
+            // حساب مقدار التداخل في كل اتجاه
+            const oX = hWidths - Math.abs(vX);
+            const oY = hHeights - Math.abs(vY);
+            
+            // تحديد اتجاه التصادم بناءً على أقل تداخل
+            if (oX >= oY) {
+                direction = vY > 0 ? "top" : "bottom";
+            } else {
+                direction = vX > 0 ? "left" : "right";
+            }
+        }
+        
+        return direction;
+    }
+            
+            // إعادة تعيين اللاعب
+            function resetPlayer() {
+                player.x = 50;
+                player.y = 300;
+                player.velX = 0;
+                player.velY = 0;
+                player.jumping = false;
+                player.grounded = false;
+            }
+            
+            // الرسم الرئيسي
+            function draw() {
+                // مسح Canvas
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                
+                // رسم الخلفية
+                ctx.fillStyle = '#1a1a2e';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // رسم العناصر
+                drawPlatforms();
+                drawSpikes();
+                drawDoor();
+                drawPlayer();
+                
+                // تحديث الحركة
+                updatePlayer();
+                handleMovement();
+                
+                // طلب الإطار التالي
+                requestAnimationFrame(draw);
+            }
+            
+            // إعداد مستمعي الأحداث
+            window.addEventListener('keydown', function(e) {
+                keys[e.keyCode] = true;
+            });
+            
+            window.addEventListener('keyup', function(e) {
+                keys[e.keyCode] = false;
+            });
+            
+            resetBtn.addEventListener('click', resetPlayer);
+            
+            toggleBtn.addEventListener('click', function() {
+                if (instructions.style.display === 'none') {
+                    instructions.style.display = 'block';
+                    toggleBtn.textContent = 'إخفاء التعليمات';
+                } else {
+                    instructions.style.display = 'none';
+                    toggleBtn.textContent = 'عرض التعليمات';
+                }
+            });
+            
+            // بدء اللعبة
+            draw();
+        });
+    </script>
 </body>
 </html>
